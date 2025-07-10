@@ -2,10 +2,12 @@ import { NextResponse } from 'next/server';
 import fs from 'fs/promises';
 import path from 'path';
 
-const agentFile = path.resolve(process.cwd(), 'data/agents.json');
+const agentFile = path.resolve(process.cwd(), 'src/data/agents.json');
 
 export async function GET() {
   const content = await fs.readFile(agentFile, 'utf-8');
+  console.log('Reading agents from file:', JSON.stringify(JSON.parse(content)));
+  
   return NextResponse.json(JSON.parse(content));
 }
 
