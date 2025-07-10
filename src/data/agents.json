@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "firstName": "Richard",
+    "lastName": "Rafiki",
+    "photoUrl": "/profilImages.png",
+    "phoneNumbers": ["+243812345678", "+243997654321"],
+    "status": true,
+    "departmentId": 1,
+    "functionId": 1
+  },
+  {
+    "id": 2,
+    "firstName": "Linda",
+    "lastName": "Mukeba",
+    "photoUrl": "/profilImages.png",
+    "phoneNumbers": ["+243810000001"],
+    "status": false,
+    "departmentId": 2,
+    "functionId": 2
+  },
+  {
+    "id": 3,
+    "firstName": "Jean",
+    "lastName": "Kabanga",
+    "photoUrl": "/profilImages.png",
+    "phoneNumbers": ["+243899999999"],
+    "status": true,
+    "departmentId": 3,
+    "functionId": 3
+  }
+]
