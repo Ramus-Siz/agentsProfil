@@ -7,7 +7,7 @@
     "photoUrl": "/profilImage.png",
     "phoneNumbers": ["+243812345678", "+243997654321"],
     "status": true,
-    "departmentId": 1,
+    "departementId": 1,
     "functionId": 1
   },
   {
@@ -27,7 +27,7 @@
     "photoUrl": "/profilImage.png",
     "phoneNumbers": ["+243899999999"],
     "status": true,
-    "departmentId": 3,
+    "departementId": 3,
     "functionId": 3
   }
 ]
