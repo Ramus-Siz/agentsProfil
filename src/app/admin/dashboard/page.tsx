@@ -1,21 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { AppSidebar } from '@/components/app-sidebar';
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
-import { Separator } from '@/components/ui/separator';
-import {
-  SidebarInset,
-  SidebarProvider,
-  SidebarTrigger,
-} from '@/components/ui/sidebar';
+import { Building2, UserCheck, Users } from 'lucide-react';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -30,11 +16,11 @@ export default function DashboardPage() {
     const fetchData = async () => {
       const [agentsRes, departmentsRes] = await Promise.all([
         fetch('/api/agents'),
-        fetch('/api/departements'),
+        fetch('/api/departments'),
       ]);
       const agents = await agentsRes.json();
       const departments = await departmentsRes.json();
-      const activeAgents = agents.filter((agent: any) => agent.status === true);
+      const activeAgents = agents.filter((agent: any) => agent.status === 'active');
 
       setStats({
         agents: agents.length,
@@ -59,57 +45,36 @@ export default function DashboardPage() {
   );
 
   return (
-    <SidebarProvider>
-      <AppSidebar />
-      <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 border-b">
-          <div className="flex items-center gap-2 px-3">
-            <SidebarTrigger />
-            <Separator orientation="vertical" className="mr-2 h-4" />
-            <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="#"></BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator className="hidden md:block" />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>Dashboard</BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
-          </div>
-        </header>
-        <div className="flex flex-1 flex-col gap-4 p-4">
-          <div className="grid gap-6 md:grid-cols-3">
-            <StatCard title="Agents enregistrés" value={stats.agents} icon={<span>👥</span>} />
-            <StatCard title="Agents actifs" value={stats.activeAgents} icon={<span>✅</span>} />
-            <StatCard title="Départements" value={stats.departments} icon={<span>🏢</span>} />
-          </div>
-          <div className="mt-6 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-6">
-            <h2 className="text-lg font-semibold text-gray-700 dark:text-white mb-4">Gérer les données</h2>
-            <div className="grid gap-4 md:grid-cols-3">
-              <button
-                onClick={() => router.push('/admin/agents')}
-                className="w-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white py-3 px-4 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700"
-              >
-                Agents
-              </button>
-              <button
-                onClick={() => router.push('/admin/departements')}
-                className="w-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white py-3 px-4 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700"
-              >
-                Départements
-              </button>
-              <button
-                onClick={() => router.push('/admin/functions')}
-                className="w-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white py-3 px-4 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700"
-              >
-                Fonctions
-              </button>
-            </div>
-          </div>
+    <div className="flex flex-1 flex-col gap-4">
+      <div className="grid gap-6 md:grid-cols-3">
+        <StatCard title="Agents enregistrés" value={stats.agents} icon={<Users className="w-10 h-10 text-[#95c11e]" />} />
+            <StatCard title="Agents actifs" value={stats.activeAgents} icon={<UserCheck className="w-10 h-10 text-[#95c11e]" />} />
+            <StatCard title="Départements" value={stats.departments} icon={<Building2 className="w-10 h-10 text-[#95c11e]" />} />
+      </div>
+
+      <div className="mt-6 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-6">
+        <h2 className="text-lg font-semibold text-gray-700 dark:text-white mb-4">Gérer les données</h2>
+        <div className="grid gap-4 md:grid-cols-3">
+          <button
+            onClick={() => router.push('/admin/agents')}
+            className="w-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white py-3 px-4 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700"
+          >
+            Agents
+          </button>
+          <button
+            onClick={() => router.push('/admin/departments')}
+            className="w-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white py-3 px-4 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700"
+          >
+            Départements
+          </button>
+          <button
+            onClick={() => router.push('/admin/functions')}
+            className="w-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white py-3 px-4 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700"
+          >
+            Fonctions
+          </button>
         </div>
-      </SidebarInset>
-    </SidebarProvider>
+      </div>
+    </div>
   );
 }

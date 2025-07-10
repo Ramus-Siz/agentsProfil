@@ -91,11 +91,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarMenuButton size="lg" asChild>
               <a href="#">
                 <div className=" text-sidebar-primary-foreground flex aspect-square size-32 items-center justify-center rounded-xl p-4">
-                  {/* <GalleryVerticalEnd className="size-4" /> */}
                   <img src="/Advans_Congo_Logo.svg" alt="" />
                 </div>
                 <div className="flex flex-col gap-0.5 leading-none text-sidebar-primary-foreground">
-                  {/* <span className="font-medium">ADVANS Congo</span> */}
                   <span className="text-sidebar-primary">Gestion profil Agents</span>
                 </div>
               </a>

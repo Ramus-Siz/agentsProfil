@@ -1,4 +1,4 @@
-export interface Department {
+export interface Departement {
   id: string;
   name: string;
 }
@@ -15,7 +15,7 @@ export interface Agent {
   photoUrl: string;
   status: boolean;
   functionId: string;
-  departmentId: string;
-  phones: string[];
+  departementId: string;
+  phoneNumbers: string[];
   createdAt: string;
 }

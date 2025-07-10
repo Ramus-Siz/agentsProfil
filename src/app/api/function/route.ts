@@ -2,10 +2,11 @@ import { NextResponse } from 'next/server';
 import fs from 'fs/promises';
 import path from 'path';
 
-const funcFile = path.resolve(process.cwd(), 'data/functions.json');
+const funcFile = path.resolve(process.cwd(), 'data/function.json');
 
 export async function GET() {
   const content = await fs.readFile(funcFile, 'utf-8');
+  console.log('Reading functions from file:', JSON.stringify(JSON.parse(content)));
   return NextResponse.json(JSON.parse(content));
 }
 
