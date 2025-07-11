@@ -68,7 +68,7 @@ export default function DashboardPage() {
             Départements
           </button>
           <button
-            onClick={() => router.push('/admin/functions')}
+            onClick={() => router.push('/admin/fonctions')}
             className="w-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white py-3 px-4 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700"
           >
             Fonctions

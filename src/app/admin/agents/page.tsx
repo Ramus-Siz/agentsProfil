@@ -10,10 +10,16 @@ import { Separator } from '@/components/ui/separator';
 import { Agent, Departement, Function } from '@/types';
 import { AddAgentDialog } from '@/components/addAgent';
 
-export default function AgentsPage() {
+type AgentsPageProps = {
+  withButton?: boolean;
+};
+
+export default function AgentsPage({ withButton = true }: AgentsPageProps) {
   const [agents, setAgents] = useState<Agent[]>([]);
   const [departments, setDepartments] = useState<Departement[]>([]);
   const [functions, setFunctions] = useState<Function[]>([]);
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
+  const [departmentFilter, setDepartmentFilter] = useState<string>('all');
   const router = useRouter();
 
   const fetchAgents = async () => {
@@ -68,26 +74,74 @@ export default function AgentsPage() {
     return '';
   };
 
-  // Fonction qui transforme "YYYY-MM" en "MM/YYYY"
   const formatMonthYear = (dateStr: string) => {
     if (!dateStr) return '';
     const [year, month] = dateStr.split('-');
     return `${month}/${year}`;
   };
 
+  // Filtrer les agents selon les filtres appliqués
+  const filteredAgents = agents.filter(agent => {
+    // Filtrer par statut
+    if (statusFilter === 'active' && agent.status !== true) return false;
+    if (statusFilter === 'inactive' && agent.status === true) return false;
+    // Filtrer par département
+    if (departmentFilter !== 'all' && String(agent.departementId) !== departmentFilter) return false;
+    return true;
+  });
+
   return (
     <div className="space-y-6 p-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Liste des agents</h1>
-        <AddAgentDialog
-          departments={departments}
-          functions={functions}
-          onAgentAdded={fetchAgents}
-        />
+        {withButton && (
+          <AddAgentDialog
+            departments={departments}
+            functions={functions}
+            onAgentAdded={fetchAgents}
+          />
+        )}
+       
       </div>
+
+      {/* Filtres */}
+      <div className="flex flex-wrap gap-4 items-center">
+        <div>
+          <label htmlFor="statusFilter" className="block mb-1 font-medium">Filtrer par statut</label>
+          <select
+            id="statusFilter"
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value as 'all' | 'active' | 'inactive')}
+            className="border rounded px-2 py-1"
+          >
+            <option value="all">Tous</option>
+            <option value="active">Actifs</option>
+            <option value="inactive">Inactifs</option>
+          </select>
+        </div>
+
+        <div>
+          <label htmlFor="departmentFilter" className="block mb-1 font-medium">Filtrer par département</label>
+          <select
+            id="departmentFilter"
+            value={departmentFilter}
+            onChange={(e) => setDepartmentFilter(e.target.value)}
+            className="border rounded px-2 py-1"
+          >
+            <option value="all">Tous</option>
+            {departments.map((dept) => (
+              <option key={dept.id} value={String(dept.id)}>
+                {dept.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
       <Separator />
+
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {agents.map((agent) => (
+        {filteredAgents.map((agent) => (
           <Card key={agent.id} className="hover:shadow-xl transition-shadow rounded-xl">
             <CardContent className="p-4 space-y-4">
               <div className="flex items-start gap-4">
@@ -106,17 +160,17 @@ export default function AgentsPage() {
                   )}
                   <p className="text-sm font-semibold text-muted-foreground">{getDepartmentName(agent.departementId)}</p>
                   <p className="text-sm text-muted-foreground">{formatPhoneNumbers(agent.phoneNumbers)}</p>
-
                 </div>
               </div>
               <div className="flex justify-between items-center">
                 <Badge variant={agent.status === true ? 'default' : 'secondary'}>
                   {agent.status === true ? 'Actif' : 'Inactif'}
                 </Badge>
+                {withButton && (
                 <Switch
                   checked={agent.status === true}
                   onCheckedChange={() => toggleStatus(agent.id, agent.status)}
-                />
+                />)}
               </div>
               <Button
                 variant="outline"

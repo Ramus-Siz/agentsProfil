@@ -14,7 +14,7 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar"
 
-// This is sample data.
+
 const data = {
   navMain: [
   
@@ -25,12 +25,10 @@ const data = {
         {
           title: "Tous les Agents",
           url: "/admin/agents",
-        },
-        {
-          title: "Ajouter un Agent",
-          url: "/admin/agents/add",
           isActive: false,
+
         },
+        
       
   
       ],
@@ -42,12 +40,9 @@ const data = {
         {
           title: "Tous les Départements",
           url: "/admin/departements",
-        },
-        {
-          title: "Ajouter un Département",
-          url: "/admin/departements/add",
           isActive: false,
-        },
+
+        }
       
   
       ],
@@ -58,23 +53,22 @@ const data = {
       items: [
         {
           title: "Toutes les Fonctions",
-          url: "/admin/function",
-        },
-        {
-          title: "Ajouter une Fonction",
-          url: "/admin/functions/add",
+          url: "/admin/fonctions",
+          isActive: false,
         },
         
       ],
     },
    
     {
-      title: "Community",
+      title: "Page publique",
       url: "#",
       items: [
         {
-          title: "Contribution Guide",
-          url: "#",
+          title: "Agents ADVANS Congo",
+          url: "/advans-agents",
+          isActive: false,
+
         },
       ],
     },
