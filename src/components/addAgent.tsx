@@ -43,7 +43,57 @@ export function AddAgentDialog({ departments, functions, onAgentAdded }: Props) 
     status: true,
   });
 
+  // Normalise les numéros, format +243xxxxxxxxx
+  const normalizePhoneNumbers = (input: string, appendSuffix = false) => {
+    let parts = input.split(',').map((p) => p.trim());
+
+    parts = parts.map((num) => {
+      let digits = num.replace(/\D/g, '');
+      if (digits.startsWith('243')) digits = digits.slice(3);
+      if (digits.startsWith('0')) digits = digits.slice(1);
+      digits = digits.slice(0, 9);
+      return '+243' + digits;
+    });
+
+    parts = parts.filter((num) => num.length === 13); // +243 + 9 chiffres
+
+    let result = parts.join(', ');
+    if (appendSuffix) {
+      result += ', +243';
+    }
+    return result;
+  };
+
+  // Autorise la saisie libre, ajoute +243 si absent
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value;
+
+    if (!value.startsWith('+243')) {
+      value = '+243' + value.replace(/^\+243/, '');
+    }
+
+    // Si la dernière touche est une virgule, ajoute suffixe
+    if (value.endsWith(',')) {
+      value = normalizePhoneNumbers(value, true);
+    }
+
+    setForm((prev) => ({ ...prev, phoneNumbers: value }));
+  };
+
+  // Normalise au blur (quand input perd le focus)
+  const handlePhoneBlur = () => {
+    const normalized = normalizePhoneNumbers(form.phoneNumbers, false);
+    setForm((prev) => ({ ...prev, phoneNumbers: normalized }));
+  };
+
   const handleChange = (field: string, value: any) => {
+    // Empêche suppression du +243 au début pour phoneNumbers
+    if (field === 'phoneNumbers') {
+      if (!value.startsWith('+243')) {
+        value = '+243' + value.replace(/^\+243/, '');
+      }
+      value = value.replace(/(?!^\+)[^\d, ]+/g, ''); // enlève tout sauf chiffres, virgules, espace et premier +
+    }
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -101,7 +151,19 @@ export function AddAgentDialog({ departments, functions, onAgentAdded }: Props) 
 
     onAgentAdded();
     setOpen(false);
-  };
+    setForm({
+      firstName: '',
+      lastName: '',
+      phoneNumbers: '',
+      photoUrl: '',
+      photoFile: null,
+      departementId: '',
+      functionId: '',
+      engagementDate: '',
+      status: false,
+    });
+ 
+};
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -128,20 +190,24 @@ export function AddAgentDialog({ departments, functions, onAgentAdded }: Props) 
           </div>
 
           <Input
-            placeholder="Téléphones (séparés par virgule)"
+            placeholder="+243xxxxxxxxx, +243xxxxxxxxx"
             value={form.phoneNumbers}
-            onChange={(e) => handleChange('phoneNumbers', e.target.value)}
+            onChange={handlePhoneChange}
+            onBlur={handlePhoneBlur}
+            maxLength={100}
           />
 
-        <label className="block">
-            <span className="text-sm font-medium text-gray-700 mb-1 block">Date d'engagement (mois/année)</span>
+          <label className="block">
+            <span className="text-sm font-medium text-gray-700 mb-1 block">
+              Date d'engagement (mois/année)
+            </span>
             <input
-                type="month"
-                value={form.engagementDate}
-                onChange={(e) => handleChange('engagementDate', e.target.value)}
-                className="w-full rounded-md border border-gray-300 px-3 py-2"
+              type="month"
+              value={form.engagementDate}
+              onChange={(e) => handleChange('engagementDate', e.target.value)}
+              className="w-full rounded-md border border-gray-300 px-3 py-2"
             />
-        </label>
+          </label>
 
           <input
             type="file"

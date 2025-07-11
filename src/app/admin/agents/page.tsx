@@ -50,10 +50,10 @@ export default function AgentsPage() {
   };
 
   const toggleStatus = async (id: string, currentStatus: boolean) => {
-    await fetch(`/api/agents/${id}`, {
+    await fetch(`/api/agents`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status: !currentStatus }),
+      body: JSON.stringify({ id: id ,status: !currentStatus, }),
     });
     setAgents((prev) =>
       prev.map((agent) =>

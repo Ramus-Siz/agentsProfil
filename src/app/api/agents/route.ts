@@ -37,3 +37,26 @@ export async function DELETE(req: Request) {
   await fs.writeFile(agentFile, JSON.stringify(agents, null, 2));
   return NextResponse.json({ success: true });
 }
+
+export async function PATCH(req: Request) {
+  const { id, status } = await req.json();
+  console.log('Updating agent status:', { id, status });
+  
+
+  if (typeof id === 'undefined' || typeof status === 'undefined') {
+    return NextResponse.json({ error: 'Missing id or status' }, { status: 400 });
+  }
+
+  const agents = JSON.parse(await fs.readFile(agentFile, 'utf-8'));
+
+  const index = agents.findIndex((a: any) => a.id === id);
+  if (index === -1) {
+    return NextResponse.json({ error: 'Agent not found' }, { status: 404 });
+  }
+
+  agents[index].status = status;
+
+  await fs.writeFile(agentFile, JSON.stringify(agents, null, 2));
+
+  return NextResponse.json(agents[index]);
+}
