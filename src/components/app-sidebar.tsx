@@ -1,5 +1,4 @@
 import * as React from "react"
-import { GalleryVerticalEnd } from "lucide-react"
 
 import {
   Sidebar,
@@ -21,15 +20,15 @@ const data = {
   
     {
       title: "Agents",
-      url: "#",
+      url: "",
       items: [
         {
           title: "Tous les Agents",
-          url: "#",
+          url: "/admin/agents",
         },
         {
           title: "Ajouter un Agent",
-          url: "#",
+          url: "/admin/agents/add",
           isActive: false,
         },
       
@@ -42,11 +41,11 @@ const data = {
       items: [
         {
           title: "Tous les Départements",
-          url: "#",
+          url: "/admin/departements",
         },
         {
           title: "Ajouter un Département",
-          url: "#",
+          url: "/admin/departements/add",
           isActive: false,
         },
       
@@ -59,11 +58,11 @@ const data = {
       items: [
         {
           title: "Toutes les Fonctions",
-          url: "#",
+          url: "/admin/function",
         },
         {
           title: "Ajouter une Fonction",
-          url: "#",
+          url: "/admin/functions/add",
         },
         
       ],

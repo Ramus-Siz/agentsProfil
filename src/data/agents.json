@@ -1,11 +1,13 @@
-
 [
   {
     "id": 1,
     "firstName": "Richard",
     "lastName": "Rafiki",
     "photoUrl": "/profilImage.png",
-    "phoneNumbers": ["+243812345678", "+243997654321"],
+    "phoneNumbers": [
+      "+243812345678",
+      "+243997654321"
+    ],
     "status": true,
     "departementId": 1,
     "functionId": 1
@@ -15,7 +17,9 @@
     "firstName": "Linda",
     "lastName": "Mukeba",
     "photoUrl": "/profilImage.png",
-    "phoneNumbers": ["+243810000001"],
+    "phoneNumbers": [
+      "+243810000001"
+    ],
     "status": false,
     "departementId": 2,
     "functionId": 2
@@ -25,9 +29,70 @@
     "firstName": "Jean",
     "lastName": "Kabanga",
     "photoUrl": "/profilImage.png",
-    "phoneNumbers": ["+243899999999"],
+    "phoneNumbers": [
+      "+243899999999"
+    ],
     "status": true,
     "departementId": 3,
     "functionId": 3
+  },
+  {
+    "id": 3,
+    "firstName": "Joshua",
+    "lastName": "Manga",
+    "photoUrl": "/profilImage.png",
+    "phoneNumbers": [
+      "+243899919999"
+    ],
+    "status": false,
+    "departementId": 3,
+    "functionId": 3
+  },
+  {
+    "firstName": "King",
+    "lastName": "kaz",
+    "phoneNumbers": [
+      "22222222222"
+    ],
+    "photoUrl": "/profilImage.png",
+    "departementId": 1,
+    "functionId": 1,
+    "status": true,
+    "id": 4
+  },
+  {
+    "firstName": "Keran",
+    "lastName": "Mukendi",
+    "phoneNumbers": "8963693369",
+    "photoUrl": "/profilImage.png",
+    "functionId": 2,
+    "status": false,
+    "departementId": "3",
+    "id": 5
+  },
+  {
+    "firstName": "Lori",
+    "lastName": "Lori",
+    "phoneNumbers": [
+      "878769584"
+    ],
+    "photoUrl": "/profilImage.png",
+    "functionId": 2,
+    "status": true,
+    "departementId": "2",
+    "id": 6
+  },
+  {
+    "firstName": "Van",
+    "lastName": "Van",
+    "phoneNumbers": [
+      "878769580"
+    ],
+    "photoUrl": "/profilImage.png",
+    "departementId": 2,
+    "functionId": 3,
+    "status": true,
+    "departmentId": "2",
+    "id": 7
   }
 ]

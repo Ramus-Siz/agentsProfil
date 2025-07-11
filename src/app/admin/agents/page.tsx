@@ -7,8 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
-import { Agent, Departement, Function  } from '@/types'; // Adjust the import path as necessary
-
+import { Agent, Departement, Function } from '@/types';
+import { AddAgentDialog } from '@/components/addAgent';
 
 export default function AgentsPage() {
   const [agents, setAgents] = useState<Agent[]>([]);
@@ -16,30 +16,27 @@ export default function AgentsPage() {
   const [functions, setFunctions] = useState<Function[]>([]);
   const router = useRouter();
 
+  const fetchAgents = async () => {
+    const res = await fetch('/api/agents');
+    const data = await res.json();
+    setAgents(data);
+  };
+
   useEffect(() => {
-    const fetchAgents = async () => {
-      const res = await fetch('/api/agents');
-      const data = await res.json();
-      setAgents(data);
-    };
+    fetchAgents();
 
     const fetchDepartments = async () => {
       const res = await fetch('/api/departements');
       const data = await res.json();
-      console.log('Departments fetched:', data);
-      
       setDepartments(data);
     };
 
     const fetchFunctions = async () => {
       const res = await fetch('/api/function');
       const data = await res.json();
-      console.log('Functions fetched:', data);
-      
       setFunctions(data);
     };
 
-    fetchAgents();
     fetchDepartments();
     fetchFunctions();
   }, []);
@@ -66,9 +63,22 @@ export default function AgentsPage() {
     );
   };
 
+  const formatPhoneNumbers = (phones: any) => {
+    if (Array.isArray(phones)) return phones.join(', ');
+    if (typeof phones === 'string') return phones;
+    return '';
+  };
+
   return (
     <div className="space-y-6 p-4">
-      <h1 className="text-2xl font-bold">Liste des agents</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold">Liste des agents</h1>
+        <AddAgentDialog
+          departments={departments}
+          functions={functions}
+          onAgentAdded={fetchAgents}
+        />
+      </div>
       <Separator />
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {agents.map((agent) => (
@@ -82,9 +92,9 @@ export default function AgentsPage() {
                 />
                 <div className="flex-1">
                   <h2 className="text-lg font-semibold">{agent.firstName} {agent.lastName}</h2>
-                  <p className="text-sm text-muted-foreground">Fonction: {getFunctionName(agent.functionId)}</p>
-                  <p className="text-sm text-muted-foreground">Tél: {agent.phoneNumbers.join(', ')}</p>
-                  <p className="text-sm text-muted-foreground">Département: {getDepartmentName(agent.departementId)}</p>
+                  <p className="text-sm text-muted-foreground">{getFunctionName(agent.functionId)}</p>
+                  <p className="text-sm text-muted-foreground">{formatPhoneNumbers(agent.phoneNumbers)}</p>
+                  <p className="text-sm text-muted-foreground">{getDepartmentName(agent.departementId)}</p>
                 </div>
               </div>
               <div className="flex justify-between items-center">

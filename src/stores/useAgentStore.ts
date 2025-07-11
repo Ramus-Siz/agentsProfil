@@ -8,7 +8,7 @@ type Agent = {
   phoneNumbers: string[];
   photoUrl?: string;
   status: boolean;
-  departmentId: number;
+  departementId: number;
   functionId: number;
 };
 

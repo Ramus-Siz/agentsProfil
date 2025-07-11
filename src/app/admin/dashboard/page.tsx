@@ -16,11 +16,11 @@ export default function DashboardPage() {
     const fetchData = async () => {
       const [agentsRes, departmentsRes] = await Promise.all([
         fetch('/api/agents'),
-        fetch('/api/departments'),
+        fetch('/api/departements'),
       ]);
       const agents = await agentsRes.json();
       const departments = await departmentsRes.json();
-      const activeAgents = agents.filter((agent: any) => agent.status === 'active');
+      const activeAgents = agents.filter((agent: any) => agent.status === true);
 
       setStats({
         agents: agents.length,
