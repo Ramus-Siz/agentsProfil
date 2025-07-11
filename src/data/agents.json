@@ -19,10 +19,10 @@
     "lastName": "Mukeba",
     "photoUrl": "/profilImage.png",
     "phoneNumbers": [
-      "+243810000001"
+      "+243810000007"
     ],
     "status": false,
-    "departementId": 2,
+    "departementId": "1",
     "functionId": 2,
     "engagementDate": "2021-07-10"
   },

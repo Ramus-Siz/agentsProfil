@@ -44,7 +44,7 @@ export function AgentDetailDialog({
   const handleSubmit = async () => {
     setLoading(true);
     const res = await fetch('/api/agents', {
-      method: 'PATCH',
+      method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(formData),
     });
