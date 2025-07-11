@@ -50,7 +50,6 @@ export default function AgentsPage() {
   };
 
   const toggleStatus = async (id: string, currentStatus: boolean) => {
-    const newStatus = currentStatus === true ? true : false;
     await fetch(`/api/agents/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -67,6 +66,13 @@ export default function AgentsPage() {
     if (Array.isArray(phones)) return phones.join(', ');
     if (typeof phones === 'string') return phones;
     return '';
+  };
+
+  // Fonction qui transforme "YYYY-MM" en "MM/YYYY"
+  const formatMonthYear = (dateStr: string) => {
+    if (!dateStr) return '';
+    const [year, month] = dateStr.split('-');
+    return `${month}/${year}`;
   };
 
   return (
@@ -93,8 +99,14 @@ export default function AgentsPage() {
                 <div className="flex-1">
                   <h2 className="text-lg font-semibold">{agent.firstName} {agent.lastName}</h2>
                   <p className="text-sm text-muted-foreground">{getFunctionName(agent.functionId)}</p>
+                  {agent.engagementDate && (
+                    <p className="text-sm text-muted-foreground">
+                      Depuis {formatMonthYear(agent.engagementDate)}
+                    </p>
+                  )}
+                  <p className="text-sm font-semibold text-muted-foreground">{getDepartmentName(agent.departementId)}</p>
                   <p className="text-sm text-muted-foreground">{formatPhoneNumbers(agent.phoneNumbers)}</p>
-                  <p className="text-sm text-muted-foreground">{getDepartmentName(agent.departementId)}</p>
+
                 </div>
               </div>
               <div className="flex justify-between items-center">

@@ -18,4 +18,5 @@ export interface Agent {
   departementId: string;
   phoneNumbers: string[];
   createdAt: string;
+  engagementDate: string;
 }
