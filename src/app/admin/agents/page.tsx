@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -9,6 +8,7 @@ import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { Agent, Departement, Function } from '@/types';
 import { AddAgentDialog } from '@/components/addAgent';
+import { AgentDetailDialog } from '@/components/dialogDetailAgents';
 
 type AgentsPageProps = {
   withButton?: boolean;
@@ -20,7 +20,25 @@ export default function AgentsPage({ withButton = true }: AgentsPageProps) {
   const [functions, setFunctions] = useState<Function[]>([]);
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
   const [departmentFilter, setDepartmentFilter] = useState<string>('all');
-  const router = useRouter();
+
+  const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
+
+  const handleOpenDetail = (agent: Agent) => {
+    setSelectedAgent(agent);
+    setIsDetailOpen(true);
+  };
+
+  const handleCloseDetail = () => {
+    setSelectedAgent(null);
+    setIsDetailOpen(false);
+  };
+
+  const handleAgentUpdated = (updatedAgent: Agent) => {
+    setAgents((prev) =>
+      prev.map((a) => (a.id === updatedAgent.id ? updatedAgent : a))
+    );
+  };
 
   const fetchAgents = async () => {
     const res = await fetch('/api/agents');
@@ -47,20 +65,19 @@ export default function AgentsPage({ withButton = true }: AgentsPageProps) {
     fetchFunctions();
   }, []);
 
-  const getDepartmentName = (id: string) => {
-    return departments.find((d) => String(d.id) === String(id))?.name || 'Inconnu';
-  };
+  const getDepartmentName = (id: string) =>
+    departments.find((d) => String(d.id) === String(id))?.name || 'Inconnu';
 
-  const getFunctionName = (id: string | number) => {
-    return functions.find((f) => String(f.id) === String(id))?.name || 'Inconnu';
-  };
+  const getFunctionName = (id: string | number) =>
+    functions.find((f) => String(f.id) === String(id))?.name || 'Inconnu';
 
   const toggleStatus = async (id: string, currentStatus: boolean) => {
     await fetch(`/api/agents`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: id ,status: !currentStatus, }),
+      body: JSON.stringify({ id, status: !currentStatus }),
     });
+
     setAgents((prev) =>
       prev.map((agent) =>
         agent.id === id ? { ...agent, status: !currentStatus } : agent
@@ -80,12 +97,9 @@ export default function AgentsPage({ withButton = true }: AgentsPageProps) {
     return `${month}/${year}`;
   };
 
-  // Filtrer les agents selon les filtres appliqués
-  const filteredAgents = agents.filter(agent => {
-    // Filtrer par statut
+  const filteredAgents = agents.filter((agent) => {
     if (statusFilter === 'active' && agent.status !== true) return false;
     if (statusFilter === 'inactive' && agent.status === true) return false;
-    // Filtrer par département
     if (departmentFilter !== 'all' && String(agent.departementId) !== departmentFilter) return false;
     return true;
   });
@@ -93,7 +107,9 @@ export default function AgentsPage({ withButton = true }: AgentsPageProps) {
   return (
     <div className="space-y-6 p-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Liste des agents</h1>
+         {withButton && (
+          <h1 className="text-2xl font-bold">Liste des agents</h1>
+        )}
         {withButton && (
           <AddAgentDialog
             departments={departments}
@@ -101,13 +117,13 @@ export default function AgentsPage({ withButton = true }: AgentsPageProps) {
             onAgentAdded={fetchAgents}
           />
         )}
-       
       </div>
 
-      {/* Filtres */}
       <div className="flex flex-wrap gap-4 items-center">
         <div>
-          <label htmlFor="statusFilter" className="block mb-1 font-medium">Filtrer par statut</label>
+          <label htmlFor="statusFilter" className="block mb-1 font-medium">
+            Filtrer par statut
+          </label>
           <select
             id="statusFilter"
             value={statusFilter}
@@ -121,7 +137,9 @@ export default function AgentsPage({ withButton = true }: AgentsPageProps) {
         </div>
 
         <div>
-          <label htmlFor="departmentFilter" className="block mb-1 font-medium">Filtrer par département</label>
+          <label htmlFor="departmentFilter" className="block mb-1 font-medium">
+            Filtrer par département
+          </label>
           <select
             id="departmentFilter"
             value={departmentFilter}
@@ -151,38 +169,72 @@ export default function AgentsPage({ withButton = true }: AgentsPageProps) {
                   className="w-16 h-16 rounded-full object-cover border"
                 />
                 <div className="flex-1">
-                  <h2 className="text-lg font-semibold">{agent.firstName} {agent.lastName}</h2>
+                  <h2 className="text-lg font-semibold">
+                    {agent.firstName} {agent.lastName}
+                  </h2>
                   <p className="text-sm text-muted-foreground">{getFunctionName(agent.functionId)}</p>
                   {agent.engagementDate && (
                     <p className="text-sm text-muted-foreground">
                       Depuis {formatMonthYear(agent.engagementDate)}
                     </p>
                   )}
-                  <p className="text-sm font-semibold text-muted-foreground">{getDepartmentName(agent.departementId)}</p>
-                  <p className="text-sm text-muted-foreground">{formatPhoneNumbers(agent.phoneNumbers)}</p>
+                  <p className="text-sm font-semibold text-muted-foreground">
+                    {getDepartmentName(agent.departementId)}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {formatPhoneNumbers(agent.phoneNumbers)}
+                  </p>
                 </div>
               </div>
               <div className="flex justify-between items-center">
                 <Badge variant={agent.status === true ? 'default' : 'secondary'}>
                   {agent.status === true ? 'Actif' : 'Inactif'}
                 </Badge>
-                {withButton && (
-                <Switch
-                  checked={agent.status === true}
-                  onCheckedChange={() => toggleStatus(agent.id, agent.status)}
-                />)}
+                {withButton? 
+                  <Switch
+                    checked={agent.status === true}
+                    onCheckedChange={() => toggleStatus(agent.id, agent.status)}
+                  />
+                  :<Switch
+                    checked={agent.status === true}
+                    onCheckedChange={() => toggleStatus(agent.id, agent.status)}
+                    disabled
+                  />
+}
               </div>
-              <Button
+              {withButton? <Button
                 variant="outline"
                 className="w-full"
-                onClick={() => router.push(`/admin/agents/${agent.id}`)}
-              >
-                Voir les détails
-              </Button>
+
+                onClick={() => handleOpenDetail(agent)}
+              >   Voir les détails
+              </Button> :           
+               <Button
+                  variant="outline"
+                  className="w-full"
+                  disabled
+                >
+                  Voir les détails
+                </Button>}
+              
+             
+  
+
             </CardContent>
           </Card>
         ))}
       </div>
+
+      {selectedAgent && (
+        <AgentDetailDialog
+          isOpen={isDetailOpen}
+          onClose={handleCloseDetail}
+          agent={selectedAgent}
+          departments={departments}
+          functions={functions}
+          onAgentUpdated={handleAgentUpdated}
+        />
+      )}
     </div>
   );
 }

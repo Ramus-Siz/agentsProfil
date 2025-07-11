@@ -18,7 +18,7 @@ export default function AgentsViewPage() {
         </div>
         <h1 className="text-4xl font-extrabold text-gray-900 mb-2">Liste des Agents</h1>
         <p className="text-gray-600 text-lg max-w-xl text-center">
-          Gestion et visualisation des profils des agents de Advans Congo
+          Gestion et visualisation des profils des agents d'Advans Congo
         </p>
       </header>
 
