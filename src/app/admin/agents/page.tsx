@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -23,6 +24,8 @@ export default function AgentsPage({ withButton = true }: AgentsPageProps) {
 
   const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
+
+  const router = useRouter();
 
   const handleOpenDetail = (agent: Agent) => {
     setSelectedAgent(agent);
@@ -104,19 +107,23 @@ export default function AgentsPage({ withButton = true }: AgentsPageProps) {
     return true;
   });
 
+  
+
   return (
     <div className="space-y-6 p-4">
+     
       <div className="flex items-center justify-between">
-         {withButton && (
-          <h1 className="text-2xl font-bold">Liste des agents</h1>
-        )}
-        {withButton && (
-          <AddAgentDialog
-            departments={departments}
-            functions={functions}
-            onAgentAdded={fetchAgents}
-          />
-        )}
+        {withButton && <h1 className="text-2xl font-bold">Liste des agents</h1>}
+        <div className="flex gap-4 items-center">
+          {withButton && (
+            <AddAgentDialog
+              departments={departments}
+              functions={functions}
+              onAgentAdded={fetchAgents}
+            />
+          )}
+          
+        </div>
       </div>
 
       <div className="flex flex-wrap gap-4 items-center">
@@ -190,36 +197,32 @@ export default function AgentsPage({ withButton = true }: AgentsPageProps) {
                 <Badge variant={agent.status === true ? 'default' : 'secondary'}>
                   {agent.status === true ? 'Actif' : 'Inactif'}
                 </Badge>
-                {withButton? 
+                {withButton ? (
                   <Switch
                     checked={agent.status === true}
                     onCheckedChange={() => toggleStatus(agent.id, agent.status)}
                   />
-                  :<Switch
+                ) : (
+                  <Switch
                     checked={agent.status === true}
                     onCheckedChange={() => toggleStatus(agent.id, agent.status)}
                     disabled
                   />
-}
+                )}
               </div>
-              {withButton? <Button
-                variant="outline"
-                className="w-full"
-
-                onClick={() => handleOpenDetail(agent)}
-              >   Voir les détails
-              </Button> :           
-               <Button
+              {withButton ? (
+                <Button
                   variant="outline"
                   className="w-full"
-                  disabled
+                  onClick={() => handleOpenDetail(agent)}
                 >
                   Voir les détails
-                </Button>}
-              
-             
-  
-
+                </Button>
+              ) : (
+                <Button variant="outline" className="w-full" disabled>
+                  Voir les détails
+                </Button>
+              )}
             </CardContent>
           </Card>
         ))}
