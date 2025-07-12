@@ -7,7 +7,7 @@ const funcFile = path.resolve(process.cwd(), 'src/data/function.json');
 
 export async function GET() {
   const content = await fs.readFile(funcFile, 'utf-8');
-  console.log('Reading functions from file:', JSON.stringify(JSON.parse(content)));
+  // console.log('Reading functions from file:', JSON.stringify(JSON.parse(content)));
   return NextResponse.json(JSON.parse(content));
 }
 

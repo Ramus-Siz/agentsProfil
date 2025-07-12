@@ -31,22 +31,64 @@ export function AgentDetailDialog({
   onAgentUpdated,
 }: Props) {
   const [formData, setFormData] = useState<Agent>(agent);
+  const [newPhotoFile, setNewPhotoFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     setFormData(agent);
+    setNewPhotoFile(null);
   }, [agent]);
 
   const handleChange = (field: keyof Agent, value: any) => {
     setFormData({ ...formData, [field]: value });
   };
 
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setNewPhotoFile(file);
+    }
+  };
+
+  const uploadImage = async (file: File): Promise<string | null> => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const res = await fetch('/api/upload', {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!res.ok) return null;
+
+    const data = await res.json();
+    return data.url;
+  };
+
+  const deleteImage = async (url: string) => {
+    await fetch('/api/delete-image', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url }),
+    });
+  };
+
   const handleSubmit = async () => {
     setLoading(true);
+    let photoUrl = formData.photoUrl;
+
+    if (newPhotoFile) {
+      if (photoUrl) {
+        await deleteImage(photoUrl); // supprime l’ancienne image
+      }
+      const uploaded = await uploadImage(newPhotoFile);
+      if (uploaded) photoUrl = uploaded;
+    }
+
     const res = await fetch('/api/agents', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(formData),
+      body: JSON.stringify({ ...formData, photoUrl }),
     });
 
     const updated = await res.json();
@@ -57,11 +99,7 @@ export function AgentDetailDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent
-        className="sm:max-w-[600px] bg-white"
-        showCloseButton={true}
-        style={{ background: 'white' }} // pour éviter le fond noir
-      >
+      <DialogContent className="sm:max-w-[600px] bg-white" showCloseButton={true}>
         <DialogHeader>
           <DialogTitle>Détails de l’agent</DialogTitle>
         </DialogHeader>
@@ -89,9 +127,21 @@ export function AgentDetailDialog({
             }
           />
 
+          {/* Affichage de l’image actuelle */}
+          {formData.photoUrl && (
+            <img
+              src={formData.photoUrl}
+              alt="Photo actuelle"
+              className="h-32 w-32 object-cover rounded-md border border-gray-300"
+            />
+          )}
+
+          {/* Upload nouvelle image */}
+          <Input type="file" accept="image/*" onChange={handlePhotoChange} />
+
           <Select
             value={String(formData.departementId)}
-            onValueChange={(val) => handleChange('departementId', val)}
+            onValueChange={(val) => handleChange('departementId', Number(val))}
           >
             <SelectTrigger>
               <SelectValue placeholder="Département" />
@@ -107,7 +157,7 @@ export function AgentDetailDialog({
 
           <Select
             value={String(formData.functionId)}
-            onValueChange={(val) => handleChange('functionId', val)}
+            onValueChange={(val) => handleChange('functionId', Number(val))}
           >
             <SelectTrigger>
               <SelectValue placeholder="Fonction" />

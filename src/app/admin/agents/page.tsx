@@ -1,4 +1,4 @@
-import AgentsPage from '@/components/agentsPage';
+import AgentsPage from '@/components/agents/agentsPage';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { redirect } from 'next/navigation';

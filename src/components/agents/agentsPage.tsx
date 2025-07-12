@@ -8,8 +8,8 @@ import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { Agent, Departement, Function } from '@/types';
-import { AddAgentDialog } from '@/components/addAgent';
-import { AgentDetailDialog } from '@/components/dialogDetailAgents';
+import { AddAgentDialog } from '@/components/agents/addAgent';
+import { AgentDetailDialog } from '@/components/agents/dialogDetailAgents';
 
 interface AgentsPageProps {
   withButton?: boolean;

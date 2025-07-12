@@ -7,7 +7,7 @@ const depFile = path.resolve(process.cwd(), 'src/data/departements.json');
 
 export async function GET() {
   const content = await fs.readFile(depFile, 'utf-8');
-  console.log('Reading departements from file:', JSON.stringify(JSON.parse(content)));
+  // console.log('Reading departements from file:', JSON.stringify(JSON.parse(content)));
   return NextResponse.json(JSON.parse(content));
 }
 
