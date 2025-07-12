@@ -23,6 +23,9 @@ export default function AgentsPage({ withButton = true }: AgentsPageProps) {
   const [departmentFilter, setDepartmentFilter] = useState<string>('all');
   const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const AGENTS_PER_PAGE = 6;
+
   const router = useRouter();
 
   const handleOpenDetail = (agent: Agent) => {
@@ -66,6 +69,10 @@ export default function AgentsPage({ withButton = true }: AgentsPageProps) {
     fetchFunctions();
   }, []);
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [statusFilter, departmentFilter]);
+
   const getDepartmentName = (id: string) =>
     departments.find((d) => String(d.id) === String(id))?.name || 'Inconnu';
 
@@ -104,6 +111,12 @@ export default function AgentsPage({ withButton = true }: AgentsPageProps) {
     if (departmentFilter !== 'all' && String(agent.departementId) !== departmentFilter) return false;
     return true;
   });
+
+  const totalPages = Math.ceil(filteredAgents.length / AGENTS_PER_PAGE);
+  const paginatedAgents = filteredAgents.slice(
+    (currentPage - 1) * AGENTS_PER_PAGE,
+    currentPage * AGENTS_PER_PAGE
+  );
 
   return (
     <div className="space-y-6 p-4">
@@ -160,7 +173,7 @@ export default function AgentsPage({ withButton = true }: AgentsPageProps) {
       <Separator />
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {filteredAgents.map((agent) => (
+        {paginatedAgents.map((agent) => (
           <Card key={agent.id} className="hover:shadow-xl transition-shadow rounded-xl">
             <CardContent className="p-4 space-y-4">
               <div className="flex items-start gap-4">
@@ -191,33 +204,47 @@ export default function AgentsPage({ withButton = true }: AgentsPageProps) {
                 <Badge variant={agent.status === true ? 'default' : 'secondary'}>
                   {agent.status === true ? 'Actif' : 'Inactif'}
                 </Badge>
-                {withButton ? (
-                  <Switch
-                    checked={agent.status === true}
-                    onCheckedChange={() => toggleStatus(agent.id, agent.status)}
-                  />
-                ) : (
-                  <Switch
-                    checked={agent.status === true}
-                    onCheckedChange={() => toggleStatus(agent.id, agent.status)}
-                    disabled
-                  />
-                )}
+                <Switch
+                  checked={agent.status === true}
+                  onCheckedChange={() => toggleStatus(agent.id, agent.status)}
+                  disabled={!withButton}
+                />
               </div>
-              {withButton ? (
-                <Button variant="outline" className="w-full" onClick={() => handleOpenDetail(agent)}>
-                  Voir les détails
-                </Button>
-              ) : (
-                <Button variant="outline" className="w-full" disabled>
-                  Voir les détails
-                </Button>
-              )}
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={() => withButton && handleOpenDetail(agent)}
+                disabled={!withButton}
+              >
+                Voir les détails
+              </Button>
             </CardContent>
           </Card>
         ))}
       </div>
 
+      {/* Pagination */}
+      <div className="flex justify-between items-center pt-6">
+        <Button
+          variant="outline"
+          disabled={currentPage === 1}
+          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+        >
+          Précédent
+        </Button>
+        <span className="text-sm text-muted-foreground">
+          Page {currentPage} sur {totalPages}
+        </span>
+        <Button
+          variant="outline"
+          disabled={currentPage === totalPages}
+          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+        >
+          Suivant
+        </Button>
+      </div>
+
+      {/* Dialog de détail */}
       {selectedAgent && (
         <AgentDetailDialog
           isOpen={isDetailOpen}

@@ -3,7 +3,7 @@
     "id": 1,
     "firstName": "Richard",
     "lastName": "Rafiki",
-    "photoUrl": "/profilImage.png",
+    "photoUrl": "/images/1752362148222-user.png",
     "phoneNumbers": [
       "+243812345678",
       "+243997654321"
@@ -108,7 +108,7 @@
     "phoneNumbers": [
       "878762580"
     ],
-    "photoUrl": "/profilImage.png",
+    "photoUrl": "/images/1752362380226-rafiki-richard Mushagalusa (1).png",
     "departementId": 2,
     "functionId": 1,
     "status": true,
