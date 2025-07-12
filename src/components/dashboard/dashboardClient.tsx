@@ -7,6 +7,7 @@ import { Building2, UserCheck, Users } from 'lucide-react';
 export default function DashboardClient() {
   const router = useRouter();
   const [stats, setStats] = useState({ agents: 0, activeAgents: 0, departments: 0 });
+  const stylBoutonRacourcis  ="w-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white py-3 cursor-pointer px-4 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700";
 
   useEffect(() => {
     const fetchData = async () => {
@@ -53,19 +54,20 @@ export default function DashboardClient() {
         <div className="grid gap-4 md:grid-cols-3">
           <button
             onClick={() => router.push('/admin/agents')}
-            className="w-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white py-3 px-4 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700"
+            className={stylBoutonRacourcis}
           >
             Agents
           </button>
           <button
             onClick={() => router.push('/admin/departements')}
-            className="w-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white py-3 px-4 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700"
+            className={stylBoutonRacourcis}
+
           >
             Départements
           </button>
           <button
             onClick={() => router.push('/admin/fonctions')}
-            className="w-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white py-3 px-4 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700"
+            className={stylBoutonRacourcis}
           >
             Fonctions
           </button>

@@ -8,6 +8,7 @@ import { Separator } from '@/components/ui/separator';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { signOut, useSession } from 'next-auth/react';
+import LogoutIcon from '@/components/icon-logout';
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
@@ -34,14 +35,8 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
           <Separator orientation="vertical" className="mr-2 h-4" />
           <h1 className="text-xl font-semibold">Administration</h1>
 
-          <div className='flex items-center justify-end flex-1'>
-            <Button
-      onClick={() => signOut({ callbackUrl: '/login' })}
-      variant="ghost"
-      size="sm"
-    >
-            Se déconnecter
-          </Button>
+          <div className='flex items-center justify-end flex-1 pr-8'>
+           <LogoutIcon />
           </div>
           
           
