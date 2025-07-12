@@ -1,17 +1,38 @@
-import { NextRequest } from 'next/server';
-import jwt from 'jsonwebtoken';
+import CredentialsProvider from 'next-auth/providers/credentials';
+import type { NextAuthOptions } from 'next-auth';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'change_this_secret';
+export const authOptions: NextAuthOptions = {
+  providers: [
+    CredentialsProvider({
+      name: 'Admin Login',
+      credentials: {
+        email: { label: 'Email', type: 'text' },
+        password: { label: 'Mot de passe', type: 'password' },
+      },
+      async authorize(credentials) {
+        const adminEmail = process.env.ADMIN_EMAIL;
+        const adminPassword = process.env.ADMIN_PASSWORD;
 
-export function verifyJwtToken(req: NextRequest) {
-  const token = req.cookies.get('token')?.value;
+        if (
+          credentials?.email === adminEmail &&
+          credentials?.password === adminPassword
+        ) {
+          return {
+            id: '1',
+            name: 'Admin',
+            email: adminEmail,
+          };
+        }
 
-  if (!token) return null;
-
-  try {
-    const payload = jwt.verify(token, JWT_SECRET);
-    return payload;
-  } catch {
-    return null;
-  }
-}
+        return null;
+      },
+    }),
+  ],
+  pages: {
+    signIn: '/login',
+  },
+  session: {
+    strategy: 'jwt',
+  },
+  secret: process.env.AUTH_SECRET,
+};

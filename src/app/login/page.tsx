@@ -1,30 +1,29 @@
 'use client';
-import { useRouter } from 'next/navigation';
+
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { signIn } from 'next-auth/react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
-export default function AdminLogin() {
-  const router = useRouter();
+export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const router = useRouter();
 
   const handleLogin = async () => {
-    const res = await fetch('/api/login', {
-      method: 'POST',
-      body: JSON.stringify({ email, password }),
-      headers: { 'Content-Type': 'application/json' },
+    const res = await signIn('credentials', {
+      redirect: false,
+      email,
+      password,
     });
-    const data = await res.json();
-    console.log('Login response:', data);
-    
-    if (data.success) {
-      localStorage.setItem('isAdminLoggedIn', 'true');
+
+    if (res?.ok) {
       router.push('/admin/dashboard');
     } else {
-      setError(data.error);
+      setError('Identifiants invalides');
     }
   };
 
@@ -45,9 +44,7 @@ export default function AdminLogin() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-          {error && (
-            <p className="text-red-600 text-sm text-center">{error}</p>
-          )}
+          {error && <p className="text-red-600 text-sm text-center">{error}</p>}
           <Button onClick={handleLogin} className="w-full">
             Se connecter
           </Button>

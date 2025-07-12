@@ -1,6 +1,7 @@
 'use client';
 
-import AgentsPage from '@/app/admin/agents/page'; 
+import AgentsPage from '@/components/agentsPage';
+// import AgentsPage from '@/app/admin/agents/page'; 
 import Image from 'next/image';
 
 export default function AgentsViewPage() {

@@ -7,14 +7,24 @@ import { AppSidebar } from '@/components/app-sidebar';
 import { Separator } from '@/components/ui/separator';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
+import { signOut, useSession } from 'next-auth/react';
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
 
  const handleLogout = async () => {
-    await fetch('/api/logout', { method: 'POST' });
+  const res = await fetch('/api/logout', { method: 'POST' });
+  console.log('Logout response:', res);
+  
+  const data = await res.json();
+
+  if (data.success) {
     router.push('/login');
-  };
+  } else {
+    console.error('Logout failed');
+  }
+};
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -25,10 +35,11 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
           <h1 className="text-xl font-semibold">Administration</h1>
 
           <div className='flex items-center justify-end flex-1'>
-            <Button 
-          variant="ghost" 
-          size={'sm'} 
-          onClick={handleLogout}>
+            <Button
+      onClick={() => signOut({ callbackUrl: '/login' })}
+      variant="ghost"
+      size="sm"
+    >
             Se déconnecter
           </Button>
           </div>
