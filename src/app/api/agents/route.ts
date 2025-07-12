@@ -1,10 +1,13 @@
 import { NextResponse } from 'next/server';
 import fs from 'fs/promises';
 import path from 'path';
+import { requireAuth } from '@/lib/auth-guard';
+
 
 const agentFile = path.resolve(process.cwd(), 'src/data/agents.json');
 
 export async function GET() {
+  
   const content = await fs.readFile(agentFile, 'utf-8');
   console.log('Reading agents from file:', JSON.stringify(JSON.parse(content)));
   
@@ -21,6 +24,11 @@ export async function POST(req: Request) {
 }
 
 export async function PUT(req: Request) {
+   try {
+    await requireAuth();
+  } catch {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
   const updatedAgent = await req.json();
   const agents = JSON.parse(await fs.readFile(agentFile, 'utf-8'));
   const index = agents.findIndex((a: any) => a.id === updatedAgent.id);
@@ -31,6 +39,11 @@ export async function PUT(req: Request) {
 }
 
 export async function DELETE(req: Request) {
+   try {
+    await requireAuth();
+  } catch {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
   const { id } = await req.json();
   let agents = JSON.parse(await fs.readFile(agentFile, 'utf-8'));
   agents = agents.filter((a: any) => a.id !== id);
@@ -39,6 +52,11 @@ export async function DELETE(req: Request) {
 }
 
 export async function PATCH(req: Request) {
+   try {
+    await requireAuth();
+  } catch {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
   const { id, status } = await req.json();
   console.log('Updating agent status:', { id, status });
   

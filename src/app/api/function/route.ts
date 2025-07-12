@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import fs from 'fs/promises';
 import path from 'path';
+import { requireAuth } from '@/lib/auth-guard';
 
 const funcFile = path.resolve(process.cwd(), 'src/data/function.json');
 
@@ -11,6 +12,11 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
+   try {
+    await requireAuth();
+  } catch {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
   const newItem = await req.json();
   const list = JSON.parse(await fs.readFile(funcFile, 'utf-8'));
   newItem.id = list.length > 0 ? list[list.length - 1].id + 1 : 1;
@@ -20,6 +26,11 @@ export async function POST(req: Request) {
 }
 
 export async function PUT(req: Request) {
+   try {
+    await requireAuth();
+  } catch {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
   const updatedItem = await req.json();
   const list = JSON.parse(await fs.readFile(funcFile, 'utf-8'));
   const index = list.findIndex((d: any) => d.id === updatedItem.id);
@@ -30,6 +41,11 @@ export async function PUT(req: Request) {
 }
 
 export async function DELETE(req: Request) {
+   try {
+    await requireAuth();
+  } catch {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
   const { id } = await req.json();
   let list = JSON.parse(await fs.readFile(funcFile, 'utf-8'));
   list = list.filter((d: any) => d.id !== id);
