@@ -29,7 +29,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-muted">
-      <Card className="w-full max-w-sm shadow-lg border-0">
+      <Card className="w-full max-w-sm shadow-lg border-0 z-50">
         <CardContent className="p-6 space-y-4">
           <h1 className="text-2xl font-bold text-center">Connexion Admin</h1>
           <Input
@@ -50,6 +50,9 @@ export default function LoginPage() {
           </Button>
         </CardContent>
       </Card>
+      <div className='absolute top-0 left-0 w-full h-full flex items-center justify-center'>
+      <img src="/Advans_Congo_Logo.svg" alt=""  className='opacity-50'/>
+      </div>
     </div>
   );
 }
