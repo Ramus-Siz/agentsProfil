@@ -1,54 +1,58 @@
+import { prisma } from '@/lib/prisma';
 import { NextResponse } from 'next/server';
-import fs from 'fs/promises';
-import path from 'path';
 import { requireAuth } from '@/lib/auth-guard';
 
-const funcFile = path.resolve(process.cwd(), 'src/data/function.json');
-
 export async function GET() {
-  const content = await fs.readFile(funcFile, 'utf-8');
-  // console.log('Reading functions from file:', JSON.stringify(JSON.parse(content)));
-  return NextResponse.json(JSON.parse(content));
+  try {
+    const functions = await prisma.function.findMany();
+    return NextResponse.json(functions);
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+  }
 }
 
 export async function POST(req: Request) {
-   try {
+  try {
     await requireAuth();
-  } catch {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const body = await req.json();
+    const newFunction = await prisma.function.create({
+      data: {
+        name: body.name,
+      },
+    });
+    return NextResponse.json(newFunction);
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
-  const newItem = await req.json();
-  const list = JSON.parse(await fs.readFile(funcFile, 'utf-8'));
-  newItem.id = list.length > 0 ? list[list.length - 1].id + 1 : 1;
-  list.push(newItem);
-  await fs.writeFile(funcFile, JSON.stringify(list, null, 2));
-  return NextResponse.json(newItem);
 }
 
 export async function PUT(req: Request) {
-   try {
+  try {
     await requireAuth();
-  } catch {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const body = await req.json();
+    const updatedFunction = await prisma.function.update({
+      where: { id: body.id },
+      data: { name: body.name },
+    });
+    return NextResponse.json(updatedFunction);
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ error: 'Not found or internal server error' }, { status: 404 });
   }
-  const updatedItem = await req.json();
-  const list = JSON.parse(await fs.readFile(funcFile, 'utf-8'));
-  const index = list.findIndex((d: any) => d.id === updatedItem.id);
-  if (index === -1) return NextResponse.json({ error: 'Not found' }, { status: 404 });
-  list[index] = updatedItem;
-  await fs.writeFile(funcFile, JSON.stringify(list, null, 2));
-  return NextResponse.json(updatedItem);
 }
 
 export async function DELETE(req: Request) {
-   try {
+  try {
     await requireAuth();
-  } catch {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const { id } = await req.json();
+    await prisma.function.delete({
+      where: { id },
+    });
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ error: 'Not found or internal server error' }, { status: 404 });
   }
-  const { id } = await req.json();
-  let list = JSON.parse(await fs.readFile(funcFile, 'utf-8'));
-  list = list.filter((d: any) => d.id !== id);
-  await fs.writeFile(funcFile, JSON.stringify(list, null, 2));
-  return NextResponse.json({ success: true });
 }
