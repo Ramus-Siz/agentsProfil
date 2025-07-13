@@ -1,7 +1,7 @@
 [
   {
     "id": 1,
-    "name": "Crédit"
+    "name": "Crédits"
   },
   {
     "id": 2,
@@ -10,5 +10,9 @@
   {
     "id": 3,
     "name": "IT"
+  },
+  {
+    "name": "Finances",
+    "id": 4
   }
 ]
