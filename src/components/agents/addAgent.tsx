@@ -30,6 +30,9 @@ interface Props {
 }
 
 export function AddAgentDialog({ departments, functions, onAgentAdded }: Props) {
+
+  const [isLoading, setIsLoading] = useState(false);
+
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({
     firstName: '',
@@ -119,6 +122,58 @@ export function AddAgentDialog({ departments, functions, onAgentAdded }: Props) 
     return data.url;
   };
 
+// const handleSubmit = async () => {
+//   try {
+//     setIsLoading(true);
+
+//     let photoUrl = form.photoUrl;
+
+//     if (form.photoFile) {
+//       const uploadedUrl = await uploadImage(form.photoFile);
+//       if (uploadedUrl) {
+//         photoUrl = uploadedUrl;
+//       }
+//     }
+
+//     const payload = {
+//       firstName: form.firstName,
+//       lastName: form.lastName,
+//       phoneNumbers: form.phoneNumbers
+//         .split(',')
+//         .map((p) => p.trim())
+//         .filter((p) => p !== ''),
+//       photoUrl,
+//       departementId: Number(form.departementId),
+//       functionId: Number(form.functionId),
+//       engagementDate: form.engagementDate,
+//       status: form.status,
+//     };
+
+//     await fetch('/api/agents', {
+//       method: 'POST',
+//       headers: { 'Content-Type': 'application/json' },
+//       body: JSON.stringify(payload),
+//     });
+
+//     onAgentAdded();
+//     setOpen(false);
+//     setForm({
+//       firstName: '',
+//       lastName: '',
+//       phoneNumbers: '',
+//       photoUrl: '',
+//       photoFile: null,
+//       departementId: '',
+//       functionId: '',
+//       engagementDate: '',
+//       status: false,
+//     });
+//   } catch (error) {
+//     console.error(error);
+//   } finally {
+//     setIsLoading(false);
+//   }
+// };
   const handleSubmit = async () => {
     let photoUrl = form.photoUrl;
 
@@ -262,7 +317,17 @@ export function AddAgentDialog({ departments, functions, onAgentAdded }: Props) 
         </div>
 
         <DialogFooter>
-          <Button onClick={handleSubmit}>Enregistrer</Button>
+          <Button onClick={handleSubmit} disabled={isLoading}>
+              {isLoading ? (
+                <div className="flex items-center gap-2">
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-t-transparent border-white" />
+                  Enregistrement...
+                </div>
+              ) : (
+                'Enregistrer'
+              )}
+          </Button>
+
         </DialogFooter>
       </DialogContent>
     </Dialog>

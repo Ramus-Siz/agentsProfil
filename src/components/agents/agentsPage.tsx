@@ -178,7 +178,7 @@ export default function AgentsPage({ withButton = true }: AgentsPageProps) {
             <CardContent className="p-4 space-y-4">
               <div className="flex items-start gap-4">
                 <img
-                  src={agent.photoUrl || '/placeholder.jpg'}
+                  src={agent.photoUrl || '/images/defaultImage.png'}
                   alt={`${agent.firstName} ${agent.lastName}`}
                   className="w-16 h-16 rounded-full object-cover border"
                 />
