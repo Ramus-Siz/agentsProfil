@@ -95,7 +95,7 @@ export function AddAgentDialog({ departments, functions, onAgentAdded }: Props) 
       if (!value.startsWith('+243')) {
         value = '+243' + value.replace(/^\+243/, '');
       }
-      value = value.replace(/(?!^\+)[^\d, ]+/g, ''); // enlève tout sauf chiffres, virgules, espace et premier +
+      value = value.replace(/(?!^\+)[^\d, ]+/g, ''); 
     }
     setForm((prev) => ({ ...prev, [field]: value }));
   };
@@ -122,59 +122,10 @@ export function AddAgentDialog({ departments, functions, onAgentAdded }: Props) 
     return data.url;
   };
 
-// const handleSubmit = async () => {
-//   try {
-//     setIsLoading(true);
+ const handleSubmit = async () => {
+  setIsLoading(true);
 
-//     let photoUrl = form.photoUrl;
-
-//     if (form.photoFile) {
-//       const uploadedUrl = await uploadImage(form.photoFile);
-//       if (uploadedUrl) {
-//         photoUrl = uploadedUrl;
-//       }
-//     }
-
-//     const payload = {
-//       firstName: form.firstName,
-//       lastName: form.lastName,
-//       phoneNumbers: form.phoneNumbers
-//         .split(',')
-//         .map((p) => p.trim())
-//         .filter((p) => p !== ''),
-//       photoUrl,
-//       departementId: Number(form.departementId),
-//       functionId: Number(form.functionId),
-//       engagementDate: form.engagementDate,
-//       status: form.status,
-//     };
-
-//     await fetch('/api/agents', {
-//       method: 'POST',
-//       headers: { 'Content-Type': 'application/json' },
-//       body: JSON.stringify(payload),
-//     });
-
-//     onAgentAdded();
-//     setOpen(false);
-//     setForm({
-//       firstName: '',
-//       lastName: '',
-//       phoneNumbers: '',
-//       photoUrl: '',
-//       photoFile: null,
-//       departementId: '',
-//       functionId: '',
-//       engagementDate: '',
-//       status: false,
-//     });
-//   } catch (error) {
-//     console.error(error);
-//   } finally {
-//     setIsLoading(false);
-//   }
-// };
-  const handleSubmit = async () => {
+  try {
     let photoUrl = form.photoUrl;
 
     if (form.photoFile) {
@@ -198,11 +149,15 @@ export function AddAgentDialog({ departments, functions, onAgentAdded }: Props) 
       status: form.status,
     };
 
-    await fetch('/api/agents', {
+    const res = await fetch('/api/agents', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
+
+    if (!res.ok) {
+      throw new Error('Erreur lors de l’enregistrement de l’agent.');
+    }
 
     onAgentAdded();
     setOpen(false);
@@ -217,8 +172,13 @@ export function AddAgentDialog({ departments, functions, onAgentAdded }: Props) 
       engagementDate: '',
       status: false,
     });
- 
+  } catch (error) {
+    console.error('Erreur lors de l’ajout de l’agent :', error);
+  }finally{
+    setIsLoading(false);
+  }
 };
+
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -318,14 +278,8 @@ export function AddAgentDialog({ departments, functions, onAgentAdded }: Props) 
 
         <DialogFooter>
           <Button onClick={handleSubmit} disabled={isLoading}>
-              {isLoading ? (
-                <div className="flex items-center gap-2">
-                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-t-transparent border-white" />
-                  Enregistrement...
-                </div>
-              ) : (
-                'Enregistrer'
-              )}
+            {isLoading && <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-[#ffcb00] border-r-transparent" />}
+            Enregistrer
           </Button>
 
         </DialogFooter>

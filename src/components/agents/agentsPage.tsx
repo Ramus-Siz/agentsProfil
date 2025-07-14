@@ -10,12 +10,16 @@ import { Separator } from '@/components/ui/separator';
 import { Agent, Departement, Function } from '@/types';
 import { AddAgentDialog } from '@/components/agents/addAgent';
 import { AgentDetailDialog } from '@/components/agents/dialogDetailAgents';
+import { Loader } from 'lucide-react';
 
 interface AgentsPageProps {
   withButton?: boolean;
 }
 
 export default function AgentsPage({ withButton = true }: AgentsPageProps) {
+
+  const [loading, setLoading] = useState(false);
+  
   const [agents, setAgents] = useState<Agent[]>([]);
   const [departments, setDepartments] = useState<Departement[]>([]);
   const [functions, setFunctions] = useState<Function[]>([]);
@@ -45,10 +49,18 @@ export default function AgentsPage({ withButton = true }: AgentsPageProps) {
   };
 
   const fetchAgents = async () => {
+  setLoading(true);
+  try {
     const res = await fetch('/api/agents');
     const data = await res.json();
     setAgents(data);
-  };
+  } catch (error) {
+    console.error('Erreur lors du chargement des agents', error);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   useEffect(() => {
     fetchAgents();
@@ -119,6 +131,9 @@ export default function AgentsPage({ withButton = true }: AgentsPageProps) {
   );
 
   return (
+    loading ? <div className="min-h-screen flex items-center justify-center bg-[#c4dd85]">
+      <Loader />
+    </div> :
     <div className="space-y-6 p-4">
       <div className="flex items-center justify-between">
         {withButton && <h1 className="text-2xl font-bold">Liste des agents</h1>}
