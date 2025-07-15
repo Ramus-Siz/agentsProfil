@@ -19,7 +19,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-
 import { useState } from 'react';
 import { Agent, Departement, Function } from '@/types';
 
@@ -30,10 +29,9 @@ interface Props {
 }
 
 export function AddAgentDialog({ departments, functions, onAgentAdded }: Props) {
-
   const [isLoading, setIsLoading] = useState(false);
-
   const [open, setOpen] = useState(false);
+
   const [form, setForm] = useState({
     firstName: '',
     lastName: '',
@@ -46,9 +44,38 @@ export function AddAgentDialog({ departments, functions, onAgentAdded }: Props) 
     status: true,
   });
 
-  // Normalise les numéros, format +243xxxxxxxxx
-  const normalizePhoneNumbers = (input: string, appendSuffix = false) => {
+  const validatePhoneNumber = (phone: string) => {
+    const clean = phone.replace('+243', '').replace(/\s/g, '');
+    return clean.length === 9 && /^[1-9]\d{8}$/.test(clean);
+  };
+
+  const getPhonesValidation = (input: string) => {
+    const numbers = input
+      .split(',')
+      .map((n) => n.trim())
+      .filter((n) => n !== '');
+    if (numbers.length > 2) return false;
+    return numbers.every(validatePhoneNumber);
+  };
+
+  const normalizePhoneNumbers = (input: string) => {
     let parts = input.split(',').map((p) => p.trim());
+    parts = parts.map((num) => {
+      let digits = num.replace(/\D/g, '');
+      if (digits.startsWith('243')) digits = digits.slice(3);
+      if (digits.startsWith('0')) digits = digits.slice(1);
+      digits = digits.slice(0, 9);
+      return '+243' + digits;
+    });
+    return parts.join(', ');
+  };
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value;
+    value = value.replace(/[^\d,+]/g, '');
+
+    let parts = value.split(',').map((p) => p.trim());
+    if (parts.length > 2) parts = parts.slice(0, 2);
 
     parts = parts.map((num) => {
       let digits = num.replace(/\D/g, '');
@@ -58,45 +85,13 @@ export function AddAgentDialog({ departments, functions, onAgentAdded }: Props) 
       return '+243' + digits;
     });
 
-    parts = parts.filter((num) => num.length === 13); // +243 + 9 chiffres
-
-    let result = parts.join(', ');
-    if (appendSuffix) {
-      result += ', +243';
-    }
-    return result;
-  };
-
-  // Autorise la saisie libre, ajoute +243 si absent
-  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let value = e.target.value;
-
-    if (!value.startsWith('+243')) {
-      value = '+243' + value.replace(/^\+243/, '');
-    }
-
-    // Si la dernière touche est une virgule, ajoute suffixe
-    if (value.endsWith(',')) {
-      value = normalizePhoneNumbers(value, true);
-    }
-
-    setForm((prev) => ({ ...prev, phoneNumbers: value }));
-  };
-
-  // Normalise au blur (quand input perd le focus)
-  const handlePhoneBlur = () => {
-    const normalized = normalizePhoneNumbers(form.phoneNumbers, false);
-    setForm((prev) => ({ ...prev, phoneNumbers: normalized }));
+    setForm((prev) => ({
+      ...prev,
+      phoneNumbers: parts.join(', '),
+    }));
   };
 
   const handleChange = (field: string, value: any) => {
-    // Empêche suppression du +243 au début pour phoneNumbers
-    if (field === 'phoneNumbers') {
-      if (!value.startsWith('+243')) {
-        value = '+243' + value.replace(/^\+243/, '');
-      }
-      value = value.replace(/(?!^\+)[^\d, ]+/g, ''); 
-    }
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -115,70 +110,61 @@ export function AddAgentDialog({ departments, functions, onAgentAdded }: Props) 
       method: 'POST',
       body: formData,
     });
-
     if (!res.ok) return null;
-
     const data = await res.json();
     return data.url;
   };
 
- const handleSubmit = async () => {
-  setIsLoading(true);
-
-  try {
-    let photoUrl = form.photoUrl;
-
-    if (form.photoFile) {
-      const uploadedUrl = await uploadImage(form.photoFile);
-      if (uploadedUrl) {
-        photoUrl = uploadedUrl;
+  const handleSubmit = async () => {
+    setIsLoading(true);
+    try {
+      let photoUrl = form.photoUrl;
+      if (form.photoFile) {
+        const uploadedUrl = await uploadImage(form.photoFile);
+        if (uploadedUrl) photoUrl = uploadedUrl;
       }
+
+      const payload = {
+        firstName: form.firstName,
+        lastName: form.lastName,
+        phoneNumbers: form.phoneNumbers
+          .split(',')
+          .map((p) => p.trim())
+          .filter((p) => p !== ''),
+        photoUrl,
+        departementId: Number(form.departementId),
+        functionId: Number(form.functionId),
+        engagementDate: form.engagementDate,
+        status: form.status,
+      };
+
+      const res = await fetch('/api/agents', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) throw new Error('Erreur lors de l’enregistrement de l’agent.');
+
+      onAgentAdded();
+      setOpen(false);
+      setForm({
+        firstName: '',
+        lastName: '',
+        phoneNumbers: '',
+        photoUrl: '',
+        photoFile: null,
+        departementId: '',
+        functionId: '',
+        engagementDate: '',
+        status: false,
+      });
+    } catch (error) {
+      console.error('Erreur lors de l’ajout de l’agent :', error);
+    } finally {
+      setIsLoading(false);
     }
-
-    const payload = {
-      firstName: form.firstName,
-      lastName: form.lastName,
-      phoneNumbers: form.phoneNumbers
-        .split(',')
-        .map((p) => p.trim())
-        .filter((p) => p !== ''),
-      photoUrl,
-      departementId: Number(form.departementId),
-      functionId: Number(form.functionId),
-      engagementDate: form.engagementDate,
-      status: form.status,
-    };
-
-    const res = await fetch('/api/agents', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
-
-    if (!res.ok) {
-      throw new Error('Erreur lors de l’enregistrement de l’agent.');
-    }
-
-    onAgentAdded();
-    setOpen(false);
-    setForm({
-      firstName: '',
-      lastName: '',
-      phoneNumbers: '',
-      photoUrl: '',
-      photoFile: null,
-      departementId: '',
-      functionId: '',
-      engagementDate: '',
-      status: false,
-    });
-  } catch (error) {
-    console.error('Erreur lors de l’ajout de l’agent :', error);
-  }finally{
-    setIsLoading(false);
-  }
-};
-
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -208,8 +194,18 @@ export function AddAgentDialog({ departments, functions, onAgentAdded }: Props) 
             placeholder="+243xxxxxxxxx, +243xxxxxxxxx"
             value={form.phoneNumbers}
             onChange={handlePhoneChange}
-            onBlur={handlePhoneBlur}
-            maxLength={100}
+            onBlur={() =>
+              setForm((prev) => ({
+                ...prev,
+                phoneNumbers: normalizePhoneNumbers(prev.phoneNumbers),
+              }))
+            }
+            maxLength={50}
+            className={
+              getPhonesValidation(form.phoneNumbers)
+                ? 'bg-green-50 border-green-500'
+                : 'bg-red-50 border-red-500'
+            }
           />
 
           <label className="block">
@@ -228,9 +224,7 @@ export function AddAgentDialog({ departments, functions, onAgentAdded }: Props) 
             type="file"
             accept="image/*"
             onChange={handleFileChange}
-            className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4
-              file:rounded-md file:border-0 file:text-sm file:font-semibold
-              file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+            className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
           />
 
           <div className="grid grid-cols-2 gap-4">
@@ -278,10 +272,11 @@ export function AddAgentDialog({ departments, functions, onAgentAdded }: Props) 
 
         <DialogFooter>
           <Button onClick={handleSubmit} disabled={isLoading}>
-            {isLoading && <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-[#ffcb00] border-r-transparent" />}
+            {isLoading && (
+              <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-[#ffcb00] border-r-transparent" />
+            )}
             Enregistrer
           </Button>
-
         </DialogFooter>
       </DialogContent>
     </Dialog>
