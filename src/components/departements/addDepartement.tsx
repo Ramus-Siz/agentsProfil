@@ -19,6 +19,7 @@ interface AgentDetailDialogProps {
   functions: Function[];
   onUpdate: () => void;
 }
+//dialog founction
 
 export function AgentDetailDialog({
   agent,
