@@ -104,7 +104,7 @@ export function AgentDetailDialog({
 
         <DialogFooter>
           <Button onClick={handleSave} disabled={loading}>
-            Enregistrer les modifications
+            Enregistrer
           </Button>
         </DialogFooter>
       </DialogContent>

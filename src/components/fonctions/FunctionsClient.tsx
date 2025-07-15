@@ -17,6 +17,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Function as AppFunction } from '@/types';
+import OverlayLoading from '../OverlayLoading';
 
 const ITEMS_PER_PAGE = 5;
 
@@ -28,11 +29,24 @@ export default function FunctionsClient() {
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
 
+  const [loading, setLoading] = useState(false);
+  
+
   const fetchData = async () => {
-    const res = await fetch('/api/function');
-    const data = await res.json();
-    setFunctions(data);
+
+    try {
+      const res = await fetch('/api/function');
+      const data = await res.json();
+      setFunctions(data);
+    } catch (error) {
+      console.error('Erreur lors du chargement des fonctions', error);
+    } finally {
+      setLoading(false);
+    }
+    
   };
+
+
 
   useEffect(() => {
     fetchData();
@@ -82,6 +96,7 @@ export default function FunctionsClient() {
   );
 
   return (
+    loading ? <OverlayLoading /> :
     <div className="p-6 space-y-6">
       <h1 className="text-2xl font-bold">Fonctions</h1>
       <div className="flex gap-2">

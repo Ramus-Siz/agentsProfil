@@ -11,6 +11,7 @@ import { Agent, Departement, Function } from '@/types';
 import { AddAgentDialog } from '@/components/agents/addAgent';
 import { AgentDetailDialog } from '@/components/agents/dialogDetailAgents';
 import { Loader } from 'lucide-react';
+import OverlayLoading from '../OverlayLoading';
 
 interface AgentsPageProps {
   withButton?: boolean;
@@ -131,9 +132,9 @@ export default function AgentsPage({ withButton = true }: AgentsPageProps) {
   );
 
   return (
-    loading ? <div className="min-h-screen flex items-center justify-center bg-[#c4dd85]">
-      <Loader />
-    </div> :
+    loading ? 
+      <OverlayLoading />
+    :
     <div className="space-y-6 p-4">
       <div className="flex items-center justify-between">
         {withButton && <h1 className="text-2xl font-bold">Liste des agents</h1>}
