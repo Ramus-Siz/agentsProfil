@@ -17,6 +17,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Departement, Agent } from '@/types';
+import OverlayLoading from '../OverlayLoading';
 
 const ITEMS_PER_PAGE = 5;
 
@@ -29,19 +30,28 @@ export default function DepartementsClient() {
   const [currentPage, setCurrentPage] = useState(1);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [newDepartmentName, setNewDepartmentName] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
 
   const fetchData = async () => {
-    const [deptRes, agentRes] = await Promise.all([
-      fetch('/api/departements'),
-      fetch('/api/agents'),
-    ]);
-    const [deptData, agentData] = await Promise.all([
-      deptRes.json(),
-      agentRes.json(),
-    ]);
+    setIsLoading(true);
+    try {
+      const [deptRes, agentRes] = await Promise.all([
+        fetch('/api/departements'),
+        fetch('/api/agents'),
+      ]);
+      const [deptData, agentData] = await Promise.all([
+        deptRes.json(),
+        agentRes.json(),
+      ]);
 
-    setDepartments(deptData);
-    setAgents(agentData);
+      setDepartments(deptData);
+      setAgents(agentData);
+    } catch (error) {
+      console.error('Erreur lors du chargement des départements', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -102,6 +112,7 @@ export default function DepartementsClient() {
   );
 
   return (
+    isLoading ? <OverlayLoading /> :
     <div className="p-6 space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Départements</h1>
