@@ -30,6 +30,9 @@ interface Props {
 }
 
 export function AddAgentDialog({ departments, functions, onAgentAdded }: Props) {
+
+  const [isLoading, setIsLoading] = useState(false);
+
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({
     firstName: '',
@@ -92,7 +95,7 @@ export function AddAgentDialog({ departments, functions, onAgentAdded }: Props) 
       if (!value.startsWith('+243')) {
         value = '+243' + value.replace(/^\+243/, '');
       }
-      value = value.replace(/(?!^\+)[^\d, ]+/g, ''); // enlève tout sauf chiffres, virgules, espace et premier +
+      value = value.replace(/(?!^\+)[^\d, ]+/g, ''); 
     }
     setForm((prev) => ({ ...prev, [field]: value }));
   };
@@ -119,7 +122,10 @@ export function AddAgentDialog({ departments, functions, onAgentAdded }: Props) 
     return data.url;
   };
 
-  const handleSubmit = async () => {
+ const handleSubmit = async () => {
+  setIsLoading(true);
+
+  try {
     let photoUrl = form.photoUrl;
 
     if (form.photoFile) {
@@ -143,11 +149,15 @@ export function AddAgentDialog({ departments, functions, onAgentAdded }: Props) 
       status: form.status,
     };
 
-    await fetch('/api/agents', {
+    const res = await fetch('/api/agents', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
+
+    if (!res.ok) {
+      throw new Error('Erreur lors de l’enregistrement de l’agent.');
+    }
 
     onAgentAdded();
     setOpen(false);
@@ -162,8 +172,13 @@ export function AddAgentDialog({ departments, functions, onAgentAdded }: Props) 
       engagementDate: '',
       status: false,
     });
- 
+  } catch (error) {
+    console.error('Erreur lors de l’ajout de l’agent :', error);
+  }finally{
+    setIsLoading(false);
+  }
 };
+
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -262,7 +277,11 @@ export function AddAgentDialog({ departments, functions, onAgentAdded }: Props) 
         </div>
 
         <DialogFooter>
-          <Button onClick={handleSubmit}>Enregistrer</Button>
+          <Button onClick={handleSubmit} disabled={isLoading}>
+            {isLoading && <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-[#ffcb00] border-r-transparent" />}
+            Enregistrer
+          </Button>
+
         </DialogFooter>
       </DialogContent>
     </Dialog>

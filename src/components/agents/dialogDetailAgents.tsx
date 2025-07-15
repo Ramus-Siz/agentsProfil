@@ -73,8 +73,9 @@ export function AgentDetailDialog({
     });
   };
 
-  const handleSubmit = async () => {
-    setLoading(true);
+const handleSubmit = async () => {
+  setLoading(true);
+  try {
     let photoUrl = formData.photoUrl;
 
     if (newPhotoFile) {
@@ -91,11 +92,19 @@ export function AgentDetailDialog({
       body: JSON.stringify({ ...formData, photoUrl }),
     });
 
+    if (!res.ok) {
+      throw new Error('Erreur lors de la mise à jour de l’agent.');
+    }
+
     const updated = await res.json();
-    setLoading(false);
     onAgentUpdated(updated);
     onClose();
-  };
+  } catch (error) {
+    console.error('Erreur lors de la mise à jour de l’agent :', error);
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -177,6 +186,7 @@ export function AgentDetailDialog({
             Annuler
           </Button>
           <Button onClick={handleSubmit} disabled={loading}>
+            {loading && <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-[#ffcb00] border-r-transparent" />}
             Enregistrer
           </Button>
         </DialogFooter>
