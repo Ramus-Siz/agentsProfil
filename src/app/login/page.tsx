@@ -6,25 +6,40 @@ import { signIn } from 'next-auth/react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import {toast} from 'sonner'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const router = useRouter();
+  const [loading, setLoading] = useState(false);  
+
 
   const handleLogin = async () => {
-    const res = await signIn('credentials', {
-      redirect: false,
-      email,
-      password,
-    });
+    try {
+      setLoading(true);
+     const res = await signIn('credentials', {
+        redirect: false,
+        email,
+        password,
+      });
 
-    if (res?.ok) {
-      router.push('/admin/dashboard');
-    } else {
+      if (res?.ok) {
+        router.push('/admin/dashboard');
+      toast.success('Connexion réussie');
+      } else {
+        setError('Identifiants invalides');
+        toast.error('Connexion échouée');
+      }
+
+    } catch (error) {
       setError('Identifiants invalides');
+      toast.error('Connexion échouée');
+    }finally{
+      setLoading(false);
     }
+   
   };
 
   return (
@@ -45,8 +60,8 @@ export default function LoginPage() {
             onChange={(e) => setPassword(e.target.value)}
           />
           {error && <p className="text-red-600 text-sm text-center">{error}</p>}
-          <Button onClick={handleLogin} className="w-full">
-            Se connecter
+          <Button onClick={handleLogin} className="w-full" disabled={loading}>
+            {loading ? 'Connexion en cours...' : 'Se connecter'}
           </Button>
         </CardContent>
       </Card>

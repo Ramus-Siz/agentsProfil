@@ -3,28 +3,44 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Building2, UserCheck, Users } from 'lucide-react';
+import OverlayLoading from '../OverlayLoading';
 
 export default function DashboardClient() {
   const router = useRouter();
   const [stats, setStats] = useState({ agents: 0, activeAgents: 0, departments: 0 });
   const stylBoutonRacourcis  ="w-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white py-3 cursor-pointer px-4 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700";
+  const [loading, setLoading] = useState(false);  
 
   useEffect(() => {
     const fetchData = async () => {
-      const [agentsRes, departmentsRes] = await Promise.all([
-        fetch('/api/agents'),
-        fetch('/api/departements'),
-      ]);
-      const agents = await agentsRes.json();
-      const departments = await departmentsRes.json();
-      const activeAgents = agents.filter((agent: any) => agent.status === true);
+  setLoading(true);
+  try {
+    const [agentsRes, departmentsRes] = await Promise.all([
+      fetch('/api/agents'),
+      fetch('/api/departements'),
+    ]);
 
-      setStats({
-        agents: agents.length,
-        activeAgents: activeAgents.length,
-        departments: departments.length,
-      });
-    };
+    if (!agentsRes.ok || !departmentsRes.ok) {
+      throw new Error('Erreur lors de la récupération des données');
+    }
+
+    const agents = await agentsRes.json();
+    const departments = await departmentsRes.json();
+
+    const activeAgents = agents.filter((agent: any) => agent.status === true);
+
+    setStats({
+      agents: agents.length,
+      activeAgents: activeAgents.length,
+      departments: departments.length,
+    });
+  } catch (error) {
+    console.error('Erreur lors du fetch des données:', error);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
     fetchData();
   }, []);
@@ -42,6 +58,7 @@ export default function DashboardClient() {
   );
 
   return (
+    loading ? <OverlayLoading /> :
     <div className="flex flex-1 flex-col gap-4">
       <div className="grid gap-6 md:grid-cols-3">
         <StatCard title="Agents enregistrés" value={stats.agents} icon={<Users className="w-10 h-10 text-[#95c11e]" />} />

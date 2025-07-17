@@ -1,15 +1,33 @@
-import { LogOut } from 'lucide-react';
+"use client";
+import { Loader2, LogOut } from 'lucide-react';
 import { signOut } from 'next-auth/react';
+import { useState } from 'react';
+import { toast } from 'sonner';
+
 
 export default function LogoutIcon() {
+const [loading, setLoading] = useState(false);
+
+  const handleLogout = async () => {
+    setLoading(true);
+    await signOut({ callbackUrl: '/login' });
+    toast.success('Vous avez bien quité votre session');
+  };
   return (
-    <LogOut
-      className="w-6 h-6 cursor-pointer text-gray-700 hover:text-red-600"
-      onClick={() => signOut({ callbackUrl: '/login' })}
+    <div
+    className="w-6 h-6 cursor-pointer text-gray-700 hover:text-red-600 "
+      onClick={handleLogout}
       role="button"
       aria-label="Se déconnecter"
+    
     >
-      <title>Se déconnecter</title>
-    </LogOut>
+    {loading ? (
+        <Loader2 className="w-12 h-12 animate-spin text-[#008237]" />
+      ) : (
+        <LogOut className="w-6 h-6 cursor-pointer text-gray-700 hover:text-red-600" />
+      )}
+
+    </div>
+    
   );
 }

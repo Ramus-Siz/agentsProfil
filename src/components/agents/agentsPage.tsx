@@ -12,6 +12,7 @@ import { AddAgentDialog } from '@/components/agents/addAgent';
 import { AgentDetailDialog } from '@/components/agents/dialogDetailAgents';
 import { Loader } from 'lucide-react';
 import OverlayLoading from '../OverlayLoading';
+import { toast } from 'sonner';
 
 interface AgentsPageProps {
   withButton?: boolean;
@@ -93,6 +94,9 @@ export default function AgentsPage({ withButton = true }: AgentsPageProps) {
     functions.find((f) => String(f.id) === String(id))?.name || 'Inconnu';
 
   const toggleStatus = async (id: string, currentStatus: boolean) => {
+try {
+
+  if (currentStatus) {
     await fetch(`/api/agents`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -104,6 +108,14 @@ export default function AgentsPage({ withButton = true }: AgentsPageProps) {
         agent.id === id ? { ...agent, status: !currentStatus } : agent
       )
     );
+
+    toast.success('Statut de l\'agent mis à jour avec succès');
+  }
+}catch (error) {
+  console.error('Erreur lors du changement de statut de l\'agent', error);
+  toast.error('Erreur lors du changement de statut de l\'agent');
+}
+
   };
 
   const formatPhoneNumbers = (phones: any) => {
