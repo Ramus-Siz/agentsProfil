@@ -83,15 +83,20 @@ export default function FunctionsClient() {
   };
 
   const addFunction = async () => {
-    if (!addName.trim()) return;
-    await fetch('/api/function', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: addName }),
-    });
-    setAddName('');
-    await fetchData();
-    toast.success('Fonction ajoutée avec succès');
+    try { 
+      if (!addName.trim()) return;
+      await fetch('/api/function', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: addName }),
+      });
+      setAddName('');
+      await fetchData();
+      toast.success('Fonction ajoutée avec succès');
+    } catch (error) {
+      console.error('Erreur lors de l\'ajout de la fonction', error);
+      toast.error('Erreur lors de l\'ajout de la fonction');
+    }
   };
 
   const totalPages = Math.ceil(functions.length / ITEMS_PER_PAGE);
