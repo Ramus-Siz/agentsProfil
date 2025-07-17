@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Agent, Departement, Function } from '@/types';
 import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 interface Props {
   isOpen: boolean;
@@ -98,9 +99,11 @@ const handleSubmit = async () => {
 
     const updated = await res.json();
     onAgentUpdated(updated);
+    toast.success('Agent mis à jour avec succès');
     onClose();
   } catch (error) {
     console.error('Erreur lors de la mise à jour de l’agent :', error);
+    toast.error('Erreur lors de la mise à jour de l’agent.');
   } finally {
     setLoading(false);
   }
