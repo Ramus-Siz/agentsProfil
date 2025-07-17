@@ -82,6 +82,7 @@
 import prisma from '@/lib/prisma';
 import { NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth-guard';
+import { log } from 'console';
 
 export async function GET() {
   const agents = await prisma.agent.findMany();
@@ -89,29 +90,26 @@ export async function GET() {
   return NextResponse.json(agents);
 }
 
-function findProvinceByAgenceCode(agenceId: string) {
-  return prisma.province.findFirst({
-    where: {
-      agences: {
-        some: {
-          provinceId: Number(agenceId),
-        },
-      },
-    },
+async function findProvinceIdByAgenceId(agenceId: number) {
+  const agence = await prisma.agence.findUnique({
+    where: { id: agenceId },
+    select: { provinceId: true },
   });
+
+  return agence?.provinceId;
 }
 
-export async function POST(req: Request) {
 
+export async function POST(req: Request) {
   const newAgent = await req.json();
 
-  console.log('New agent:', newAgent);
-  const province = await findProvinceByAgenceCode(newAgent.agenceId);
-  if (!province) {
-    return NextResponse.json({ error: 'Province not found for the given agence code' }, { status: 404 });
+  const provinceId = await findProvinceIdByAgenceId(Number(newAgent.agenceId));
+
+  if (!provinceId) {
+    return NextResponse.json({ error: 'Province not found for the given agence id' }, { status: 404 });
   }
 
-  newAgent.provinceId = province.id;
+  newAgent.provinceId = provinceId;
 
   const created = await prisma.agent.create({
     data: {
@@ -120,7 +118,7 @@ export async function POST(req: Request) {
       phoneNumbers: newAgent.phoneNumbers,
       photoUrl: newAgent.photoUrl,
       agenceId: Number(newAgent.agenceId),
-      provinceId: Number(newAgent.provinceId),
+      provinceId: provinceId,
       departementId: Number(newAgent.departementId),
       functionId: Number(newAgent.functionId),
       engagementDate: newAgent.engagementDate,
@@ -130,6 +128,7 @@ export async function POST(req: Request) {
 
   return NextResponse.json(created);
 }
+
 
 export async function PUT(req: Request) {
   try {

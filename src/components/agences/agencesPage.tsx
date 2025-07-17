@@ -208,7 +208,7 @@ export default function AgencesClient() {
                     </SelectContent>
                   </Select>
                 ) : (
-                  agence.name
+                  agence.provinceId
                 )}
               </td>
               <td className="p-2 border text-center flex justify-center gap-2">

@@ -30,6 +30,12 @@ export default function AgentsPage({ withButton = true }: AgentsPageProps) {
   const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+
+  const [agences, setAgences] = useState<any[]>([]);
+  const [provinces, setProvinces] = useState<any[]>([]);
+  const [provinceFilter, setProvinceFilter] = useState<string>('all');
+  const [agenceFilter, setAgenceFilter] = useState<string>('all');
+
   const AGENTS_PER_PAGE = 6;
 
   const router = useRouter();
@@ -67,6 +73,22 @@ export default function AgentsPage({ withButton = true }: AgentsPageProps) {
   useEffect(() => {
     fetchAgents();
 
+    const fetchAgences = async () => {
+  const res = await fetch('/api/agences');
+  const data = await res.json();
+  setAgences(data);
+};
+
+const fetchProvinces = async () => {
+  const res = await fetch('/api/provinces');
+  const data = await res.json();
+  setProvinces(data);
+};
+
+fetchAgences();
+fetchProvinces();
+
+
     const fetchDepartments = async () => {
       const res = await fetch('/api/departements');
       const data = await res.json();
@@ -96,6 +118,7 @@ export default function AgentsPage({ withButton = true }: AgentsPageProps) {
   const toggleStatus = async (id: string, currentStatus: boolean) => {
   try {
 
+  if (currentStatus) 
     await fetch(`/api/agents`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -129,12 +152,17 @@ export default function AgentsPage({ withButton = true }: AgentsPageProps) {
     return `${month}/${year}`;
   };
 
-  const filteredAgents = agents.filter((agent) => {
-    if (statusFilter === 'active' && agent.status !== true) return false;
-    if (statusFilter === 'inactive' && agent.status === true) return false;
-    if (departmentFilter !== 'all' && String(agent.departementId) !== departmentFilter) return false;
-    return true;
-  });
+const filteredAgents = agents.filter((agent) => {
+  if (statusFilter === 'active' && agent.status !== true) return false;
+  if (statusFilter === 'inactive' && agent.status === true) return false;
+  if (departmentFilter !== 'all' && String(agent.departementId) !== departmentFilter) return false;
+  if (agenceFilter !== 'all' && String(agent.agenceId) !== agenceFilter) return false;
+  if (provinceFilter !== 'all') {
+    const agence = agences.find((a) => a.id === agent.agenceId);
+    if (!agence || String(agence.provinceId) !== provinceFilter) return false;
+  }
+  return true;
+});
 
   const totalPages = Math.ceil(filteredAgents.length / AGENTS_PER_PAGE);
   const paginatedAgents = filteredAgents.slice(
@@ -152,10 +180,9 @@ export default function AgentsPage({ withButton = true }: AgentsPageProps) {
         <div className="flex gap-4 items-center">
           {withButton && (
             <AddAgentDialog
-              departments={departments}
-              functions={functions}
-              onAgentAdded={fetchAgents}
-            />
+                departments={departments}
+                functions={functions}
+                onAgentAdded={fetchAgents} agences={[]}  />
           )}
         </div>
       </div>
@@ -195,6 +222,40 @@ export default function AgentsPage({ withButton = true }: AgentsPageProps) {
             ))}
           </select>
         </div>
+        <div>
+  <label className="block mb-1 font-medium">Filtrer par province</label>
+  <select
+    value={provinceFilter}
+    onChange={(e) => setProvinceFilter(e.target.value)}
+    className="border rounded px-2 py-1"
+  >
+    <option value="all">Toutes</option>
+    {provinces.map((prov) => (
+      <option key={prov.id} value={String(prov.id)}>
+        {prov.name}
+      </option>
+    ))}
+  </select>
+</div>
+
+<div>
+  <label className="block mb-1 font-medium">Filtrer par agence</label>
+  <select
+    value={agenceFilter}
+    onChange={(e) => setAgenceFilter(e.target.value)}
+    className="border rounded px-2 py-1"
+  >
+    <option value="all">Toutes</option>
+    {agences
+      .filter((ag) => provinceFilter === 'all' || ag.provinceId === Number(provinceFilter))
+      .map((ag) => (
+        <option key={ag.id} value={String(ag.id)}>
+          {ag.name} ({ag.codeAgence})
+        </option>
+      ))}
+  </select>
+</div>
+
       </div>
 
       <Separator />

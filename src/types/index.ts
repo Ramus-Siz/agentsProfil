@@ -16,6 +16,8 @@ export interface Agent {
   status: boolean;
   functionId: string;
   departementId: string;
+  agenceId: string;
+  provinceId: string;
   phoneNumbers: string[];
   createdAt: string;
   engagementDate: string;
