@@ -22,7 +22,7 @@ const [loading, setLoading] = useState(false);
     
     >
     {loading ? (
-        <Loader2 className="w-12 h-12 animate-spin text-[#008237]" />
+        <Loader2 className="w-4 h-4 animate-spin text-[#008237]" />
       ) : (
         <LogOut className="w-6 h-6 cursor-pointer text-gray-700 hover:text-red-600" />
       )}
