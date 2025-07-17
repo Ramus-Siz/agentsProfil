@@ -59,6 +59,23 @@ const data = {
         
       ],
     },
+    {
+      title: "Provinces & Agences",
+      url: "#",
+      items: [
+        {
+          title: "Nos Agences",
+          url: "/admin/agences",
+          isActive: false,
+        },
+         {
+          title: "Provinces",
+          url: "/admin/provinces",
+          isActive: false,
+        },
+        
+      ],
+    },
    
     {
       title: "Page publique",

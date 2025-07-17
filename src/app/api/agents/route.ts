@@ -89,12 +89,29 @@ export async function GET() {
   return NextResponse.json(agents);
 }
 
+function findProvinceByAgenceCode(agenceId: string) {
+  return prisma.province.findFirst({
+    where: {
+      agences: {
+        some: {
+          provinceId: Number(agenceId),
+        },
+      },
+    },
+  });
+}
+
 export async function POST(req: Request) {
 
   const newAgent = await req.json();
 
   console.log('New agent:', newAgent);
-  
+  const province = await findProvinceByAgenceCode(newAgent.agenceId);
+  if (!province) {
+    return NextResponse.json({ error: 'Province not found for the given agence code' }, { status: 404 });
+  }
+
+  newAgent.provinceId = province.id;
 
   const created = await prisma.agent.create({
     data: {
@@ -102,6 +119,8 @@ export async function POST(req: Request) {
       lastName: newAgent.lastName,
       phoneNumbers: newAgent.phoneNumbers,
       photoUrl: newAgent.photoUrl,
+      agenceId: Number(newAgent.agenceId),
+      provinceId: Number(newAgent.provinceId),
       departementId: Number(newAgent.departementId),
       functionId: Number(newAgent.functionId),
       engagementDate: newAgent.engagementDate,
@@ -120,7 +139,6 @@ export async function PUT(req: Request) {
   }
 
   const updatedAgent = await req.json();
-
   const updated = await prisma.agent.update({
     where: { id: updatedAgent.id },
     data: {

@@ -20,3 +20,19 @@ export interface Agent {
   createdAt: string;
   engagementDate: string;
 }
+
+
+export interface Agence {
+  id: number;
+  name: string;
+  codeAgence: string;
+  provinceId: number;
+  agents: Agent[];
+}
+
+export interface Province {
+  id: number;
+  name: string;
+  agences: Agence[];
+  agents: Agent[];
+}

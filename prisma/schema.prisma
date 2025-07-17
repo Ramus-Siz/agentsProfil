@@ -18,10 +18,12 @@ model Province {
 model Agence {
   id         Int      @id @default(autoincrement())
   name       String
+  codeAgence String   @unique
   provinceId Int
   province   Province @relation(fields: [provinceId], references: [id])
   agents     Agent[]
 }
+
 
 model Departement {
   id      Int      @id @default(autoincrement())

@@ -19,20 +19,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useState } from 'react';
-import { Agent, Departement, Function } from '@/types';
+import { useEffect, useState } from 'react';
+import { Agence, Departement, Function } from '@/types';
 import { toast } from 'sonner';
 
 
 interface Props {
   departments: Departement[];
   functions: Function[];
+  agences: Agence[];
   onAgentAdded: () => void;
 }
 
 export function AddAgentDialog({ departments, functions, onAgentAdded }: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const [agences, setAgences] = useState<Agence[]>([]);
+
 
   const [form, setForm] = useState({
     firstName: '',
@@ -42,9 +45,26 @@ export function AddAgentDialog({ departments, functions, onAgentAdded }: Props) 
     photoFile: null as File | null,
     departementId: '',
     functionId: '',
+    agenceId: '',
     engagementDate: '',
     status: true,
   });
+
+   const fetchData = async () => {
+      try {
+        const [agencesRes] = await Promise.all([
+          fetch('/api/agences'),
+        ]);
+        const agencesData = await agencesRes.json();
+        setAgences(agencesData);
+      } catch (error) {
+        toast.error('Erreur lors du chargement des agences');
+      } 
+    };
+  
+   useEffect(() => {
+       fetchData();
+     }, []);
 
   const validatePhoneNumber = (phone: string) => {
     const clean = phone.replace('+243', '').replace(/\s/g, '');
@@ -134,6 +154,7 @@ export function AddAgentDialog({ departments, functions, onAgentAdded }: Props) 
           .map((p) => p.trim())
           .filter((p) => p !== ''),
         photoUrl,
+        agenceId: form.agenceId,
         departementId: Number(form.departementId),
         functionId: Number(form.functionId),
         engagementDate: form.engagementDate,
@@ -158,6 +179,7 @@ export function AddAgentDialog({ departments, functions, onAgentAdded }: Props) 
         photoFile: null,
         departementId: '',
         functionId: '',
+        agenceId: '',
         engagementDate: '',
         status: false,
       });
@@ -248,6 +270,21 @@ export function AddAgentDialog({ departments, functions, onAgentAdded }: Props) 
                 </SelectContent>
               </Select>
             </div>
+            <div>
+                <Label className="mb-1 block">Agence</Label>
+                <Select onValueChange={(value) => handleChange('agenceId', value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Choisir une agence" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {agences.map((agence) => (
+                      <SelectItem key={agence.id} value={String(agence.id)}>
+                        {agence.name} ({agence.codeAgence})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
             <div>
               <Label className="mb-1 block">Fonction</Label>
@@ -264,6 +301,7 @@ export function AddAgentDialog({ departments, functions, onAgentAdded }: Props) 
                 </SelectContent>
               </Select>
             </div>
+            
           </div>
 
           <div className="flex items-center gap-4 mt-2">
