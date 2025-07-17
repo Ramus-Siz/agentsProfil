@@ -18,6 +18,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Function as AppFunction } from '@/types';
 import OverlayLoading from '../OverlayLoading';
+import { toast } from 'sonner';
 
 const ITEMS_PER_PAGE = 5;
 
@@ -40,6 +41,7 @@ export default function FunctionsClient() {
       setFunctions(data);
     } catch (error) {
       console.error('Erreur lors du chargement des fonctions', error);
+      toast.error('Erreur lors du chargement des fonctions');
     } finally {
       setLoading(false);
     }
@@ -66,6 +68,7 @@ export default function FunctionsClient() {
     await fetchData();
     setEditingId(null);
     setNewName('');
+    toast.success('Fonction modifiée avec succès');
   };
 
   const confirmDelete = async () => {
@@ -76,6 +79,7 @@ export default function FunctionsClient() {
     });
     setDeleteId(null);
     await fetchData();
+    toast.success('Fonction supprimée avec succès');
   };
 
   const addFunction = async () => {
@@ -87,6 +91,7 @@ export default function FunctionsClient() {
     });
     setAddName('');
     await fetchData();
+    toast.success('Fonction ajoutée avec succès');
   };
 
   const totalPages = Math.ceil(functions.length / ITEMS_PER_PAGE);

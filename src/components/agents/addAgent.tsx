@@ -21,6 +21,8 @@ import {
 } from '@/components/ui/select';
 import { useState } from 'react';
 import { Agent, Departement, Function } from '@/types';
+import { toast } from 'sonner';
+
 
 interface Props {
   departments: Departement[];
@@ -159,7 +161,10 @@ export function AddAgentDialog({ departments, functions, onAgentAdded }: Props) 
         engagementDate: '',
         status: false,
       });
+
+      toast.success('Agent ajouté avec succès');
     } catch (error) {
+      toast.error("Erreur lors de l’enregistrement de l’agent.");
       console.error('Erreur lors de l’ajout de l’agent :', error);
     } finally {
       setIsLoading(false);

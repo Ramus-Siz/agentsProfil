@@ -19,7 +19,7 @@ interface AgentsPageProps {
 
 export default function AgentsPage({ withButton = true }: AgentsPageProps) {
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);  
   
   const [agents, setAgents] = useState<Agent[]>([]);
   const [departments, setDepartments] = useState<Departement[]>([]);

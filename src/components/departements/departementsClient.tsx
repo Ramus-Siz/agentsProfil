@@ -18,6 +18,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Departement, Agent } from '@/types';
 import OverlayLoading from '../OverlayLoading';
+import { toast } from 'sonner';
 
 const ITEMS_PER_PAGE = 5;
 
@@ -76,6 +77,7 @@ export default function DepartementsClient() {
     await fetchData();
     setEditingId(null);
     setNewName('');
+    toast.success('Departement modifié avec succès');
   };
 
   const confirmDelete = async () => {
@@ -91,18 +93,26 @@ export default function DepartementsClient() {
     });
     setDeleteId(null);
     await fetchData();
+    toast.success('Departement supprimé avec succès');
   };
 
   const handleAddDepartment = async () => {
-    if (!newDepartmentName.trim()) return;
-    await fetch('/api/departements', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: newDepartmentName.trim() }),
-    });
-    setNewDepartmentName('');
-    setShowAddDialog(false);
-    await fetchData();
+    try {
+        if (!newDepartmentName.trim()) return;
+      await fetch('/api/departements', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: newDepartmentName.trim() }),
+      });
+      setNewDepartmentName('');
+      setShowAddDialog(false);
+      await fetchData();
+      toast.success('Departement ajouté avec succès');
+    } catch (error) {
+      toast.error('Erreur lors de l\'ajout du département');
+      console.error('Erreur lors de l\'ajout du département', error);
+    }
+
   };
 
   const totalPages = Math.ceil(departments.length / ITEMS_PER_PAGE);
