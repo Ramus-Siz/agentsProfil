@@ -94,9 +94,8 @@ export default function AgentsPage({ withButton = true }: AgentsPageProps) {
     functions.find((f) => String(f.id) === String(id))?.name || 'Inconnu';
 
   const toggleStatus = async (id: string, currentStatus: boolean) => {
-try {
+  try {
 
-  if (currentStatus) {
     await fetch(`/api/agents`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -108,9 +107,9 @@ try {
         agent.id === id ? { ...agent, status: !currentStatus } : agent
       )
     );
-
+    // withButton=!currentStatus;
     toast.success('Statut de l\'agent mis à jour avec succès');
-  }
+  
 }catch (error) {
   console.error('Erreur lors du changement de statut de l\'agent', error);
   toast.error('Erreur lors du changement de statut de l\'agent');
