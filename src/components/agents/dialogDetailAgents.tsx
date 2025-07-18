@@ -248,7 +248,7 @@ export function AgentDetailDialog({
             <SelectContent>
               {agences.map((a) => (
                 <SelectItem key={a.id} value={String(a.id)}>
-                  {a.codeAgence}
+                  {a.name}({a.codeAgence})
                 </SelectItem>
               ))}
             </SelectContent>

@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -10,7 +9,6 @@ import { Separator } from '@/components/ui/separator';
 import { Agent, Departement, Function } from '@/types';
 import { AddAgentDialog } from '@/components/agents/addAgent';
 import { AgentDetailDialog } from '@/components/agents/dialogDetailAgents';
-import { Loader } from 'lucide-react';
 import OverlayLoading from '../OverlayLoading';
 import { toast } from 'sonner';
 
@@ -19,79 +17,38 @@ interface AgentsPageProps {
 }
 
 export default function AgentsPage({ withButton = true }: AgentsPageProps) {
-
-  const [loading, setLoading] = useState(false);  
-  
+  const [loading, setLoading] = useState(false);
   const [agents, setAgents] = useState<Agent[]>([]);
   const [departments, setDepartments] = useState<Departement[]>([]);
   const [functions, setFunctions] = useState<Function[]>([]);
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
   const [departmentFilter, setDepartmentFilter] = useState<string>('all');
+  const [provinceFilter, setProvinceFilter] = useState<string>('all');
+  const [agenceFilter, setAgenceFilter] = useState<string>('all');
+
+  const [agences, setAgences] = useState<any[]>([]);
+  const [provinces, setProvinces] = useState<any[]>([]);
+
   const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const [agences, setAgences] = useState<any[]>([]);
-  const [provinces, setProvinces] = useState<any[]>([]);
-  const [provinceFilter, setProvinceFilter] = useState<string>('all');
-  const [agenceFilter, setAgenceFilter] = useState<string>('all');
-
   const AGENTS_PER_PAGE = 6;
-
-  const router = useRouter();
-
-  const handleOpenDetail = (agent: Agent) => {
-    setSelectedAgent(agent);
-    setIsDetailOpen(true);
-  };
-
-  const handleCloseDetail = () => {
-    setSelectedAgent(null);
-    setIsDetailOpen(false);
-  };
-
-  const handleAgentUpdated = (updatedAgent: Agent | null) => {
-    if (!updatedAgent){
-      fetchAgents();
-    }else
-    setAgents((prev) =>
-      prev.map((a) => (a.id === updatedAgent.id ? updatedAgent : a))
-    );
-    
-  };
-
-  const fetchAgents = async () => {
-  setLoading(true);
-  try {
-    const res = await fetch('/api/agents');
-    const data = await res.json();
-    setAgents(data);
-  } catch (error) {
-    console.error('Erreur lors du chargement des agents', error);
-  } finally {
-    setLoading(false);
-  }
-};
-
 
   useEffect(() => {
     fetchAgents();
 
     const fetchAgences = async () => {
-  const res = await fetch('/api/agences');
-  const data = await res.json();
-  setAgences(data);
-};
+      const res = await fetch('/api/agences');
+      const data = await res.json();
+      setAgences(data);
+    };
 
-const fetchProvinces = async () => {
-  const res = await fetch('/api/provinces');
-  const data = await res.json();
-  setProvinces(data);
-};
-
-fetchAgences();
-fetchProvinces();
-
+    const fetchProvinces = async () => {
+      const res = await fetch('/api/provinces');
+      const data = await res.json();
+      setProvinces(data);
+    };
 
     const fetchDepartments = async () => {
       const res = await fetch('/api/departements');
@@ -105,13 +62,32 @@ fetchProvinces();
       setFunctions(data);
     };
 
+    fetchAgences();
+    fetchProvinces();
     fetchDepartments();
     fetchFunctions();
   }, []);
 
+  const fetchAgents = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch('/api/agents');
+      const data = await res.json();
+      setAgents(data);
+    } catch (error) {
+      console.error('Erreur lors du chargement des agents', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     setCurrentPage(1);
-  }, [statusFilter, departmentFilter]);
+  }, [statusFilter, departmentFilter, provinceFilter, agenceFilter]);
+
+  useEffect(() => {
+    setAgenceFilter('all');
+  }, [provinceFilter]);
 
   const getDepartmentName = (id: string) =>
     departments.find((d) => String(d.id) === String(id))?.name || 'Inconnu';
@@ -120,53 +96,39 @@ fetchProvinces();
     functions.find((f) => String(f.id) === String(id))?.name || 'Inconnu';
 
   const toggleStatus = async (id: string, currentStatus: boolean) => {
-  try {
-
-  if (currentStatus) 
-    await fetch(`/api/agents`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id, status: !currentStatus }),
-    });
-
-    setAgents((prev) =>
-      prev.map((agent) =>
-        agent.id === id ? { ...agent, status: !currentStatus } : agent
-      )
-    );
-    // withButton=!currentStatus;
-    toast.success('Statut de l\'agent mis à jour avec succès');
-  
-}catch (error) {
-  console.error('Erreur lors du changement de statut de l\'agent', error);
-  toast.error('Erreur lors du changement de statut de l\'agent');
-}
-
+    try {
+      await fetch(`/api/agents`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, status: !currentStatus }),
+      });
+      setAgents((prev) =>
+        prev.map((agent) =>
+          agent.id === id ? { ...agent, status: !currentStatus } : agent
+        )
+      );
+      toast.success('Statut de l\'agent mis à jour avec succès');
+    } catch (error) {
+      console.error('Erreur lors du changement de statut de l\'agent', error);
+      toast.error('Erreur lors du changement de statut de l\'agent');
+    }
   };
 
-  const formatPhoneNumbers = (phones: any) => {
-    if (Array.isArray(phones)) return phones.join(', ');
-    if (typeof phones === 'string') return phones;
-    return '';
-  };
+  const filteredAgences = agences.filter(
+    (ag) => provinceFilter === 'all' || ag.provinceId === Number(provinceFilter)
+  );
 
-  const formatMonthYear = (dateStr: string) => {
-    if (!dateStr) return '';
-    const [year, month] = dateStr.split('-');
-    return `${month}/${year}`;
-  };
-
-const filteredAgents = agents.filter((agent) => {
-  if (statusFilter === 'active' && agent.status !== true) return false;
-  if (statusFilter === 'inactive' && agent.status === true) return false;
-  if (departmentFilter !== 'all' && String(agent.departementId) !== departmentFilter) return false;
-  if (agenceFilter !== 'all' && String(agent.agenceId) !== agenceFilter) return false;
-  if (provinceFilter !== 'all') {
-    const agence = agences.find((a) => a.id === agent.agenceId);
-    if (!agence || String(agence.provinceId) !== provinceFilter) return false;
-  }
-  return true;
-});
+  const filteredAgents = agents.filter((agent) => {
+    if (statusFilter === 'active' && agent.status !== true) return false;
+    if (statusFilter === 'inactive' && agent.status === true) return false;
+    if (departmentFilter !== 'all' && String(agent.departementId) !== departmentFilter) return false;
+    if (provinceFilter !== 'all') {
+      const agence = agences.find((a) => a.id === agent.agenceId);
+      if (!agence || String(agence.provinceId) !== provinceFilter) return false;
+    }
+    if (agenceFilter !== 'all' && String(agent.agenceId) !== agenceFilter) return false;
+    return true;
+  });
 
   const totalPages = Math.ceil(filteredAgents.length / AGENTS_PER_PAGE);
   const paginatedAgents = filteredAgents.slice(
@@ -174,30 +136,26 @@ const filteredAgents = agents.filter((agent) => {
     currentPage * AGENTS_PER_PAGE
   );
 
-  return (
-    loading ? 
-      <OverlayLoading />
-    :
+  return loading ? (
+    <OverlayLoading />
+  ) : (
     <div className="space-y-6 p-4">
       <div className="flex items-center justify-between">
         {withButton && <h1 className="text-2xl font-bold">Liste des agents</h1>}
-        <div className="flex gap-4 items-center">
-          {withButton && (
-            <AddAgentDialog
-                departments={departments}
-                functions={functions}
-                onAgentAdded={fetchAgents} agences={[]}  />
-          )}
-        </div>
+        {withButton && (
+          <AddAgentDialog
+            departments={departments}
+            functions={functions}
+            onAgentAdded={fetchAgents}
+            agences={agences}
+          />
+        )}
       </div>
 
       <div className="flex flex-wrap gap-4 items-center">
         <div>
-          <label htmlFor="statusFilter" className="block mb-1 font-medium">
-            Filtrer par statut
-          </label>
+          <label className="block mb-1 font-medium">Statut</label>
           <select
-            id="statusFilter"
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as 'all' | 'active' | 'inactive')}
             className="border rounded px-2 py-1"
@@ -209,11 +167,8 @@ const filteredAgents = agents.filter((agent) => {
         </div>
 
         <div>
-          <label htmlFor="departmentFilter" className="block mb-1 font-medium">
-            Filtrer par département
-          </label>
+          <label className="block mb-1 font-medium">Département</label>
           <select
-            id="departmentFilter"
             value={departmentFilter}
             onChange={(e) => setDepartmentFilter(e.target.value)}
             className="border rounded px-2 py-1"
@@ -226,40 +181,38 @@ const filteredAgents = agents.filter((agent) => {
             ))}
           </select>
         </div>
+
+        {/* <div>
+          <label className="block mb-1 font-medium">Province</label>
+          <select
+            value={provinceFilter}
+            onChange={(e) => setProvinceFilter(e.target.value)}
+            className="border rounded px-2 py-1"
+          >
+            <option value="all">Toutes</option>
+            {provinces.map((prov) => (
+              <option key={prov.id} value={String(prov.id)}>
+                {prov.name}
+              </option>
+            ))}
+          </select>
+        </div> */}
+
         <div>
-  <label className="block mb-1 font-medium">Filtrer par province</label>
-  <select
-    value={provinceFilter}
-    onChange={(e) => setProvinceFilter(e.target.value)}
-    className="border rounded px-2 py-1"
-  >
-    <option value="all">Toutes</option>
-    {provinces.map((prov) => (
-      <option key={prov.id} value={String(prov.id)}>
-        {prov.name}
-      </option>
-    ))}
-  </select>
-</div>
-
-<div>
-  <label className="block mb-1 font-medium">Filtrer par agence</label>
-  <select
-    value={agenceFilter}
-    onChange={(e) => setAgenceFilter(e.target.value)}
-    className="border rounded px-2 py-1"
-  >
-    <option value="all">Toutes</option>
-    {agences
-      .filter((ag) => provinceFilter === 'all' || ag.provinceId === Number(provinceFilter))
-      .map((ag) => (
-        <option key={ag.id} value={String(ag.id)}>
-          {ag.name} ({ag.codeAgence})
-        </option>
-      ))}
-  </select>
-</div>
-
+          <label className="block mb-1 font-medium">Agence</label>
+          <select
+            value={agenceFilter}
+            onChange={(e) => setAgenceFilter(e.target.value)}
+            className="border rounded px-2 py-1"
+          >
+            <option value="all">Toutes</option>
+            {filteredAgences.map((ag) => (
+              <option key={ag.id} value={String(ag.id)}>
+                {ag.name} ({ag.codeAgence})
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       <Separator />
@@ -281,14 +234,16 @@ const filteredAgents = agents.filter((agent) => {
                   <p className="text-sm text-muted-foreground">{getFunctionName(agent.functionId)}</p>
                   {agent.engagementDate && (
                     <p className="text-sm text-muted-foreground">
-                      Depuis {formatMonthYear(agent.engagementDate)}
+                      Depuis {agent.engagementDate.split('-').reverse().join('/')}
                     </p>
                   )}
                   <p className="text-sm font-semibold text-muted-foreground">
                     {getDepartmentName(agent.departementId)}
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    {formatPhoneNumbers(agent.phoneNumbers)}
+                    {Array.isArray(agent.phoneNumbers)
+                      ? agent.phoneNumbers.join(', ')
+                      : agent.phoneNumbers}
                   </p>
                 </div>
               </div>
@@ -305,7 +260,7 @@ const filteredAgents = agents.filter((agent) => {
               <Button
                 variant="outline"
                 className="w-full"
-                onClick={() => withButton && handleOpenDetail(agent)}
+                onClick={() => withButton && setSelectedAgent(agent) || setIsDetailOpen(true)}
                 disabled={!withButton}
               >
                 Voir les détails
@@ -315,7 +270,6 @@ const filteredAgents = agents.filter((agent) => {
         ))}
       </div>
 
-      {/* Pagination */}
       <div className="flex justify-between items-center pt-6">
         <Button
           variant="outline"
@@ -336,15 +290,17 @@ const filteredAgents = agents.filter((agent) => {
         </Button>
       </div>
 
-      {/* Dialog de détail */}
       {selectedAgent && (
         <AgentDetailDialog
           isOpen={isDetailOpen}
-          onClose={handleCloseDetail}
+          onClose={() => {
+            setIsDetailOpen(false);
+            setSelectedAgent(null);
+          }}
           agent={selectedAgent}
           departments={departments}
           functions={functions}
-          onAgentUpdated={handleAgentUpdated}
+          onAgentUpdated={() => fetchAgents()}
           agences={agences}
           provinces={provinces}
         />

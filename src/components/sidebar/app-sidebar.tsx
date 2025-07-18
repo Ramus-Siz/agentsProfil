@@ -66,7 +66,7 @@ const data = {
         {
           title: "Nos Agences",
           url: "/admin/agences",
-          isActive: false,
+          isActive: true,
         },
          {
           title: "Provinces",
@@ -85,6 +85,8 @@ const data = {
           title: "Agents ADVANS Congo",
           url: "/advans-agents",
           isActive: false,
+          target:"_blank",
+
 
         },
       ],
