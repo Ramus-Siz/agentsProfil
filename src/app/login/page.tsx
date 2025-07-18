@@ -26,8 +26,8 @@ export default function LoginPage() {
       });
 
       if (res?.ok) {
-        router.push('/admin/dashboard');
       toast.success('Connexion réussie');
+      router.push('/admin/dashboard');
       } else {
         setError('Identifiants invalides');
         toast.error('Connexion échouée');
