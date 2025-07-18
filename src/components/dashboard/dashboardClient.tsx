@@ -2,50 +2,62 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Building2, UserCheck, Users } from 'lucide-react';
+import { Building2, Landmark, UserCheck, Users } from 'lucide-react';
 import OverlayLoading from '../OverlayLoading';
 
 export default function DashboardClient() {
   const router = useRouter();
-  const [stats, setStats] = useState({ agents: 0, activeAgents: 0, departments: 0 });
-  const stylBoutonRacourcis  ="w-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white py-3 cursor-pointer px-4 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700";
-  const [loading, setLoading] = useState(false);  
+  const [stats, setStats] = useState({ agents: 0, activeAgents: 0, departments: 0, agences: 0 });
+  const [loading, setLoading] = useState(false);
+
+  const stylBoutonRacourcis =
+    'w-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white py-3 cursor-pointer px-4 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700';
 
   useEffect(() => {
     const fetchData = async () => {
-  setLoading(true);
-  try {
-    const [agentsRes, departmentsRes] = await Promise.all([
-      fetch('/api/agents'),
-      fetch('/api/departements'),
-    ]);
+      setLoading(true);
+      try {
+        const [agentsRes, departmentsRes, agencesRes] = await Promise.all([
+          fetch('/api/agents'),
+          fetch('/api/departements'),
+          fetch('/api/agences'),
+        ]);
 
-    if (!agentsRes.ok || !departmentsRes.ok) {
-      throw new Error('Erreur lors de la récupération des données');
-    }
+        if (!agentsRes.ok || !departmentsRes.ok || !agencesRes.ok) {
+          throw new Error('Erreur lors de la récupération des données');
+        }
 
-    const agents = await agentsRes.json();
-    const departments = await departmentsRes.json();
+        const agents = await agentsRes.json();
+        const departments = await departmentsRes.json();
+        const agences = await agencesRes.json();
 
-    const activeAgents = agents.filter((agent: any) => agent.status === true);
+        const activeAgents = agents.filter((agent: any) => agent.status === true);
 
-    setStats({
-      agents: agents.length,
-      activeAgents: activeAgents.length,
-      departments: departments.length,
-    });
-  } catch (error) {
-    console.error('Erreur lors du fetch des données:', error);
-  } finally {
-    setLoading(false);
-  }
-};
-
+        setStats({
+          agents: agents.length,
+          activeAgents: activeAgents.length,
+          departments: departments.length,
+          agences: agences.length,
+        });
+      } catch (error) {
+        console.error('Erreur lors du fetch des données:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
     fetchData();
   }, []);
 
-  const StatCard = ({ title, value, icon }: { title: string; value: number; icon: React.ReactNode }) => (
+  const StatCard = ({
+    title,
+    value,
+    icon,
+  }: {
+    title: string;
+    value: number;
+    icon: React.ReactNode;
+  }) => (
     <div className="rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-6 shadow-sm hover:shadow-md transition-all">
       <div className="flex items-center justify-between">
         <div>
@@ -57,16 +69,34 @@ export default function DashboardClient() {
     </div>
   );
 
-  return (
-    loading ? <OverlayLoading /> :
-    <div className="flex flex-1 flex-col gap-4">
-      <div className="grid gap-6 md:grid-cols-3">
-        <StatCard title="Agents enregistrés" value={stats.agents} icon={<Users className="w-10 h-10 text-[#95c11e]" />} />
-        <StatCard title="Agents actifs" value={stats.activeAgents} icon={<UserCheck className="w-10 h-10 text-[#95c11e]" />} />
-        <StatCard title="Départements" value={stats.departments} icon={<Building2 className="w-10 h-10 text-[#95c11e]" />} />
+  return loading ? (
+    <OverlayLoading />
+  ) : (
+    <div className="flex flex-1 flex-col gap-6">
+      <div className="grid gap-6 md:grid-cols-4">
+        <StatCard
+          title="Agents enregistrés"
+          value={stats.agents}
+          icon={<Users className="w-10 h-10 text-[#95c11e]" />}
+        />
+        <StatCard
+          title="Agents actifs"
+          value={stats.activeAgents}
+          icon={<UserCheck className="w-10 h-10 text-[#95c11e]" />}
+        />
+        <StatCard
+          title="Départements"
+          value={stats.departments}
+          icon={<Building2 className="w-10 h-10 text-[#95c11e]" />}
+        />
+        <StatCard
+          title="Agences"
+          value={stats.agences}
+          icon={<Landmark className="w-10 h-10 text-[#95c11e]" />}
+        />
       </div>
 
-      <div className="mt-6 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-6">
+      <div className="mt-8 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-6">
         <h2 className="text-lg font-semibold text-gray-700 dark:text-white mb-4">Gérer les données</h2>
         <div className="grid gap-4 md:grid-cols-3">
           <button
@@ -78,7 +108,6 @@ export default function DashboardClient() {
           <button
             onClick={() => router.push('/admin/departements')}
             className={stylBoutonRacourcis}
-
           >
             Départements
           </button>

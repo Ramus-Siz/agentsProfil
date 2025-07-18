@@ -66,7 +66,7 @@ const data = {
         {
           title: "Nos Agences",
           url: "/admin/agences",
-          isActive: true,
+          isActive: false,
         },
          {
           title: "Provinces",
@@ -85,7 +85,7 @@ const data = {
           title: "Agents ADVANS Congo",
           url: "/advans-agents",
           isActive: false,
-          target:"_blank",
+          
 
 
         },
@@ -117,6 +117,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarGroup>
           <SidebarMenu>
             {data.navMain.map((item) => (
+              
               <SidebarMenuItem key={item.title}>
                 <SidebarMenuButton asChild>
                   <a href={item.url} className="font-medium">

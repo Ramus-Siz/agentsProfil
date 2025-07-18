@@ -11,6 +11,7 @@ import { AddAgentDialog } from '@/components/agents/addAgent';
 import { AgentDetailDialog } from '@/components/agents/dialogDetailAgents';
 import OverlayLoading from '../OverlayLoading';
 import { toast } from 'sonner';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 
 interface AgentsPageProps {
   withButton?: boolean;
@@ -155,18 +156,36 @@ export default function AgentsPage({ withButton = true }: AgentsPageProps) {
       <div className="flex flex-wrap gap-4 items-center">
         <div>
           <label className="block mb-1 font-medium">Statut</label>
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value as 'all' | 'active' | 'inactive')}
-            className="border rounded px-2 py-1"
-          >
-            <option value="all">Tous</option>
-            <option value="active">Actifs</option>
-            <option value="inactive">Inactifs</option>
-          </select>
+          <Select onValueChange={(value) => setStatusFilter(value as 'all' | 'active' | 'inactive')} value={statusFilter}>
+                <SelectTrigger className="w-[200px]">
+                  <SelectValue placeholder="Statut" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all" className="hover:bg-primary/10">Tous</SelectItem>
+                  <SelectItem value="active" className="hover:bg-primary/10">Actifs</SelectItem>
+                  <SelectItem value="inactive" className="hover:bg-primary/10">Inactifs</SelectItem>
+                </SelectContent>
+          </Select>
         </div>
-
         <div>
+          <label className="block mb-1 font-medium">Département</label>
+          <Select onValueChange={setDepartmentFilter} value={departmentFilter}>
+            <SelectTrigger className="w-[200px]">
+              <SelectValue placeholder="Département" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tous</SelectItem>
+              {departments.map((dept) => (
+                <SelectItem key={dept.id} value={String(dept.id)} className="hover:bg-primary/10">
+                  {dept.name}
+                </SelectItem>
+              ))}
+          </SelectContent>
+        </Select>
+        </div>
+        
+
+        {/* <div>
           <label className="block mb-1 font-medium">Département</label>
           <select
             value={departmentFilter}
@@ -180,7 +199,7 @@ export default function AgentsPage({ withButton = true }: AgentsPageProps) {
               </option>
             ))}
           </select>
-        </div>
+        </div> */}
 
         {/* <div>
           <label className="block mb-1 font-medium">Province</label>
@@ -199,19 +218,20 @@ export default function AgentsPage({ withButton = true }: AgentsPageProps) {
         </div> */}
 
         <div>
-          <label className="block mb-1 font-medium">Agence</label>
-          <select
-            value={agenceFilter}
-            onChange={(e) => setAgenceFilter(e.target.value)}
-            className="border rounded px-2 py-1"
-          >
-            <option value="all">Toutes</option>
-            {filteredAgences.map((ag) => (
-              <option key={ag.id} value={String(ag.id)}>
-                {ag.name} ({ag.codeAgence})
-              </option>
-            ))}
-          </select>
+        <label className="block mb-1 font-medium">Agence</label>
+         <Select onValueChange={setAgenceFilter} value={agenceFilter}>
+              <SelectTrigger className="w-[200px]">
+                <SelectValue placeholder="Agence" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Toutes</SelectItem>
+                {filteredAgences.map((ag) => (
+                  <SelectItem key={ag.id} value={String(ag.id)} className="hover:bg-primary/10">
+                    {ag.name} ({ag.codeAgence})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+          </Select>
         </div>
       </div>
 
