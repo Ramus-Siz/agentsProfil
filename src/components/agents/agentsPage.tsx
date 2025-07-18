@@ -50,10 +50,14 @@ export default function AgentsPage({ withButton = true }: AgentsPageProps) {
     setIsDetailOpen(false);
   };
 
-  const handleAgentUpdated = (updatedAgent: Agent) => {
+  const handleAgentUpdated = (updatedAgent: Agent | null) => {
+    if (!updatedAgent){
+      fetchAgents();
+    }else
     setAgents((prev) =>
       prev.map((a) => (a.id === updatedAgent.id ? updatedAgent : a))
     );
+    
   };
 
   const fetchAgents = async () => {
@@ -341,6 +345,8 @@ const filteredAgents = agents.filter((agent) => {
           departments={departments}
           functions={functions}
           onAgentUpdated={handleAgentUpdated}
+          agences={agences}
+          provinces={provinces}
         />
       )}
     </div>

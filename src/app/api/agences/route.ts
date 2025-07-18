@@ -34,21 +34,27 @@ export async function POST(req: Request) {
     const body = await req.json();
     console.log('Received data for new agence:', body);
 
-    // Création de l'agence
     const newAgence = await prisma.agence.create({
       data: {
         name: body.name,
         codeAgence: body.code,
         provinceId: body.provinceId,
       },
+      include: {
+        province: true, 
+      },
     });
 
-    return NextResponse.json(newAgence);
+    return NextResponse.json({
+      ...newAgence,
+      provinceName: newAgence.province.name,
+    });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
+
 
 export async function PUT(req: Request) {
   try {

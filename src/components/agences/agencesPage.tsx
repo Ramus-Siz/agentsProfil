@@ -19,13 +19,13 @@ import { Separator } from '@/components/ui/separator';
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
 import OverlayLoading from '../OverlayLoading';
 import { toast } from 'sonner';
-import { Agence, Province, Function } from '@/types';
+import { Agence, Province, Function, AgenceForResponse } from '@/types';
 
 
 const ITEMS_PER_PAGE = 5;
 
 export default function AgencesClient() {
-  const [agences, setAgences] = useState<Agence[]>([]);
+  const [agences, setAgences] = useState<AgenceForResponse[]>([]);
   const [provinces, setProvinces] = useState<Province[]>([]);
 
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -47,6 +47,8 @@ export default function AgencesClient() {
         fetch('/api/provinces'),
       ]);
       const agencesData = await agencesRes.json();
+      console.log('Agences data:', agencesData);
+      
       const provincesData = await provincesRes.json();
       setAgences(agencesData);
       setProvinces(provincesData);
@@ -208,7 +210,8 @@ export default function AgencesClient() {
                     </SelectContent>
                   </Select>
                 ) : (
-                  agence.provinceId
+                 agence.province.name
+
                 )}
               </td>
               <td className="p-2 border text-center flex justify-center gap-2">

@@ -32,6 +32,19 @@ export interface Agence {
   agents: Agent[];
 }
 
+export interface AgenceForResponse {
+  id: number;
+  name: string;
+  codeAgence: string;
+  provinceId: number;
+  province: {
+    id: number;
+    name: string;
+  };
+
+  agents: Agent[];
+}
+
 export interface Province {
   id: number;
   name: string;

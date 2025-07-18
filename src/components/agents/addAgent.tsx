@@ -7,6 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -201,6 +202,9 @@ export function AddAgentDialog({ departments, functions, onAgentAdded }: Props) 
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle>Nouvel Agent</DialogTitle>
+          <DialogDescription>
+            Modifie les informations ci-dessous et clique sur Enregistrer.
+        </DialogDescription>
         </DialogHeader>
 
         <div className="grid gap-4 py-4">
