@@ -11,7 +11,7 @@ export default function DashboardClient() {
   const [loading, setLoading] = useState(false);
 
   const stylBoutonRacourcis =
-    'w-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white py-3 cursor-pointer px-4 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700';
+    'w-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white py-3 cursor-pointer px-4 rounded-md hover:bg-[#95c11e] dark:hover:bg-gray-700';
 
   useEffect(() => {
     const fetchData = async () => {
