@@ -97,27 +97,42 @@ export default function AgencesClient() {
     toast.success('Agence supprimée avec succès');
   };
 
-  const addAgence = async () => {
-    try {
-      if (!addName.trim() || !addCode.trim() || !addProvinceId) return;
-      await fetch('/api/agences', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: addName,
-          code: addCode,
-          provinceId: Number(addProvinceId),
-        }),
-      });      
-      setAddName('');
-      setAddCode('');
-      setAddProvinceId('');
-      await fetchData();
-      toast.success('Agence ajoutée avec succès');
-    } catch (error) {
-      toast.error('Erreur lors de l\'ajout de l\'agence');
+const addAgence = async () => {
+  try {
+    if (!addName.trim() || !addCode.trim() || !addProvinceId) return;
+
+    const res = await fetch('/api/agences', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: addName,
+        code: addCode,
+        provinceId: Number(addProvinceId),
+      }),
+    });
+
+    if (!res.ok) {
+      const data = await res.json();
+      if (data?.error?.includes('code agence existe')) {
+        toast.error('Ce code agence existe déjà.');
+      } else {
+        toast.error('Erreur lors de l\'ajout de l\'agence');
+      }
+      return;
     }
-  };
+
+    setAddName('');
+    setAddCode('');
+    setAddProvinceId('');
+    await fetchData();
+    toast.success('Agence ajoutée avec succès');
+    
+  } catch (error) {
+    console.error(error);
+    toast.error('Erreur lors de l\'ajout de l\'agence');
+  }
+};
+
 
   const totalPages = Math.ceil(agences.length / ITEMS_PER_PAGE);
   const paginatedAgences = agences.slice(

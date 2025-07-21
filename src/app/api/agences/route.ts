@@ -34,6 +34,19 @@ export async function POST(req: Request) {
     const body = await req.json();
     console.log('Received data for new agence:', body);
 
+    // Vérifie si le codeAgence existe déjà
+    const existingAgence = await prisma.agence.findUnique({
+      where: { codeAgence: body.code },
+    });
+
+    if (existingAgence) {
+      return NextResponse.json(
+        { error: 'Le code agence existe déjà.' },
+        { status: 400 }
+      );
+    }
+
+    // Si non existant, on crée l'agence
     const newAgence = await prisma.agence.create({
       data: {
         name: body.name,
@@ -41,7 +54,7 @@ export async function POST(req: Request) {
         provinceId: body.provinceId,
       },
       include: {
-        province: true, 
+        province: true,
       },
     });
 
@@ -51,7 +64,10 @@ export async function POST(req: Request) {
     });
   } catch (error) {
     console.error(error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Internal Server Error' },
+      { status: 500 }
+    );
   }
 }
 

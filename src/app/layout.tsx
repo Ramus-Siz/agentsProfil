@@ -33,7 +33,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Toaster />
+        <Toaster richColors={true} />
         {children}
       </body>
     </html>
