@@ -35,7 +35,13 @@ interface Props {
 export function AddAgentDialog({ departments, functions, onAgentAdded }: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const [openAddFunction, setOpenAddFunction] = useState(false);
+
   const [agences, setAgences] = useState<Agence[]>([]);
+  const [addName, setAddName] = useState('');
+  const [addFonctionId, setAddFonctionId] = useState('');
+
+
 
 
   const [form, setForm] = useState({
@@ -157,7 +163,7 @@ export function AddAgentDialog({ departments, functions, onAgentAdded }: Props) 
         photoUrl,
         agenceId: form.agenceId,
         departementId: Number(form.departementId),
-        functionId: Number(form.functionId),
+        functionId: addFonctionId !== '' ? addFonctionId : Number(form.functionId),
         engagementDate: form.engagementDate,
         status: form.status,
       };
@@ -172,6 +178,7 @@ export function AddAgentDialog({ departments, functions, onAgentAdded }: Props) 
 
       onAgentAdded();
       setOpen(false);
+    setOpenAddFunction(false);
       setForm({
         firstName: '',
         lastName: '',
@@ -193,6 +200,35 @@ export function AddAgentDialog({ departments, functions, onAgentAdded }: Props) 
       setIsLoading(false);
     }
   };
+
+ const addFunction = async () => {
+  setAddFonctionId('');
+  
+  try {
+    if (!addName.trim()) return;
+
+    const res = await fetch('/api/function', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: addName }),
+    });
+
+    if (!res.ok) throw new Error('Erreur serveur');
+
+    const data = await res.json();
+    setAddFonctionId(data.id); 
+    setOpenAddFunction(true);
+    console.log('Fonction ajoutée avec ID :', data.id); 
+
+    setAddName('');
+    // await fetchData();
+    toast.success(`Fonction ajoutée avec succès (ID: ${data.id})`);
+  } catch (error) {
+    console.error("Erreur lors de l'ajout de la fonction", error);
+    toast.error("Erreur lors de l'ajout de la fonction");
+  }
+};
+
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -290,20 +326,38 @@ export function AddAgentDialog({ departments, functions, onAgentAdded }: Props) 
                 </Select>
               </div>
 
-            <div>
-              <Label className="mb-1 block">Fonction</Label>
-              <Select onValueChange={(value) => handleChange('functionId', value)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Choisir une fonction" />
-                </SelectTrigger>
-                <SelectContent>
-                  {functions.map((func) => (
-                    <SelectItem key={func.id} value={String(func.id)}>
-                      {func.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            <div className="col-span-2 flex justify-between items-center ">
+              <div>
+                <Label className="mb-1 block">Fonction</Label>
+                <Select onValueChange={(value) => handleChange('functionId', value) } disabled={openAddFunction}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Choisir une fonction" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {functions.map((func) => (
+                      <SelectItem key={func.id} value={String(func.id)}>
+                        {func.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+              </div>
+            
+              <div className="">
+                <Label className="mb-1 block">Nouvelle fonction</Label>
+                <div className='flex items-center gap-2'>
+                  <Input
+                  placeholder="Ou créer une nouvelle fonction"
+                  value={addName}
+                  onChange={(e) => setAddName(e.target.value)}
+                  className="w-64 text-sm"
+                />
+                <Button className='border bg-transparent border-[#95c11e] text-[#656564] px-2 py-1 text-sm' onClick={addFunction}>Créer</Button>
+
+                </div>
+                
+              </div>
             </div>
             
           </div>

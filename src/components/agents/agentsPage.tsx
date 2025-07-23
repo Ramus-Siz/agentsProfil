@@ -185,38 +185,6 @@ export default function AgentsPage({ withButton = true }: AgentsPageProps) {
         </div>
         
 
-        {/* <div>
-          <label className="block mb-1 font-medium">Département</label>
-          <select
-            value={departmentFilter}
-            onChange={(e) => setDepartmentFilter(e.target.value)}
-            className="border rounded px-2 py-1"
-          >
-            <option value="all">Tous</option>
-            {departments.map((dept) => (
-              <option key={dept.id} value={String(dept.id)}>
-                {dept.name}
-              </option>
-            ))}
-          </select>
-        </div> */}
-
-        {/* <div>
-          <label className="block mb-1 font-medium">Province</label>
-          <select
-            value={provinceFilter}
-            onChange={(e) => setProvinceFilter(e.target.value)}
-            className="border rounded px-2 py-1"
-          >
-            <option value="all">Toutes</option>
-            {provinces.map((prov) => (
-              <option key={prov.id} value={String(prov.id)}>
-                {prov.name}
-              </option>
-            ))}
-          </select>
-        </div> */}
-
         <div>
         <label className="block mb-1 font-medium">Agence</label>
          <Select onValueChange={setAgenceFilter} value={agenceFilter}>

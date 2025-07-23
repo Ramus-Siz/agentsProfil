@@ -12,16 +12,37 @@ export async function GET() {
   }
 }
 
+// export async function POST(req: Request) {
+//   try {
+//     await requireAuth();
+//     const body = await req.json();
+//     const newFunction = await prisma.function.create({
+//       data: {
+//         name: body.name,
+//       },
+//     });
+//     return NextResponse.json(newFunction);
+//   } catch (error) {
+//     console.error(error);
+//     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+//   }
+// }
+
 export async function POST(req: Request) {
   try {
     await requireAuth();
     const body = await req.json();
+
     const newFunction = await prisma.function.create({
       data: {
         name: body.name,
       },
     });
-    return NextResponse.json(newFunction);
+
+    return NextResponse.json({
+      id: newFunction.id,
+      name: newFunction.name,
+    });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });

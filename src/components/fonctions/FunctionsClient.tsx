@@ -34,7 +34,7 @@ export default function FunctionsClient() {
   
 
   const fetchData = async () => {
-
+    setLoading(true);
     try {
       const res = await fetch('/api/function');
       const data = await res.json();
