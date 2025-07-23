@@ -126,7 +126,7 @@ export default function AdvansAgentsPage() {
 
   return (
     
-  <div className="flex min-h-screen bg-gray-50">
+  <div className="flex min-h-screen bg-gray-50 ">
   {/* Sidebar fixe avec logo */}
   <aside className="w-60 bg-white border-r shadow-md p-4 flex flex-col items-center sticky top-0 h-screen">
     <img src="/Advans_Congo_Logo.svg" alt="Advans Congo Logo" className="h-16 mb-6" />
@@ -180,57 +180,61 @@ export default function AdvansAgentsPage() {
 
   <main className="flex-1 p-6 overflow-auto space-y-8">
     {/* Filtres et recherche */}
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div>
-        <label className="block mb-1 text-sm font-medium text-gray-700">Département</label>
-        <Select onValueChange={setDepartmentFilter} value={departmentFilter}>
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder="Département" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Tous</SelectItem>
-            {departments.map((dept) => (
-              <SelectItem key={dept.id} value={String(dept.id)}>
-                {dept.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+    <div className='flex flex-wrap gap-4 mb-6 items-center justify-between'>
+       {/* Titre section */}
+            <div className="flex items-center space-x-3">
+                <Image className="w-8 h-8 text-[#ffcb00]" />
+                <h1 className="text-2xl font-bold text-[#656564]">Répertoire photo</h1>
+            </div>
+            <div className="flex flex-wrap gap-4 items-center justify-end">
+            <div>
+              <label className="block mb-1 text-sm font-medium text-gray-700">Département</label>
+              <Select onValueChange={setDepartmentFilter} value={departmentFilter}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Département" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tous</SelectItem>
+                  {departments.map((dept) => (
+                    <SelectItem key={dept.id} value={String(dept.id)}>
+                      {dept.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-      <div>
-        <label className="block mb-1 text-sm font-medium text-gray-700">Agence</label>
-        <Select onValueChange={setAgenceFilter} value={agenceFilter}>
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder="Agence" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Toutes</SelectItem>
-            {filteredAgences.map((ag) => (
-              <SelectItem key={ag.id} value={String(ag.id)}>
-                {ag.name} ({ag.codeAgence})
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+            <div>
+              <label className="block mb-1 text-sm font-medium text-gray-700">Agence</label>
+              <Select onValueChange={setAgenceFilter} value={agenceFilter}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Agence" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Toutes</SelectItem>
+                  {filteredAgences.map((ag) => (
+                    <SelectItem key={ag.id} value={String(ag.id)}>
+                      {ag.name} ({ag.codeAgence})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-      <div>
-        <label className="block mb-1 text-sm font-medium text-gray-700">Recherche</label>
-        <input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Nom ou Prénom"
-          className="border rounded-md px-3 py-2 w-full text-sm focus:outline-none focus:ring-2 focus:ring-[#008237] shadow-sm"
-        />
-      </div>
+            <div>
+              <label className="block mb-1 text-sm font-medium text-gray-700">Recherche</label>
+              <input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Nom ou Prénom"
+                className="border rounded-md px-3 py-2 w-full text-sm focus:outline-none focus:ring-2 focus:ring-[#008237] shadow-sm"
+              />
+            </div>
     </div>
-
-    {/* Titre section */}
-    <div className="mt-8 flex items-center space-x-3">
-      <Image className="w-8 h-8 text-[#ffcb00]" />
-      <h1 className="text-2xl font-bold text-[#656564]">Répertoire photo</h1>
     </div>
+    
+
+   
 
     <Separator />
 
