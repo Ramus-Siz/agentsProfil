@@ -4,7 +4,11 @@ import { requireAuth } from '@/lib/auth-guard';
 
 export async function GET() {
   try {
-    const functions = await prisma.function.findMany();
+    const functions = await prisma.function.findMany(
+      {
+        orderBy: { name: 'asc' },
+      }
+    );
     return NextResponse.json(functions);
   } catch (error) {
     console.error(error);

@@ -8,7 +8,12 @@ export async function GET() {
       include: {
         province: true,
       },
+      orderBy: { name: 'asc' }
     });
+
+    if (!agences || agences.length === 0) {
+      return NextResponse.json({ error: 'No agences found' }, { status: 404 });
+    }
 
     // On retourne aussi le nom de la province avec chaque agence
     const data = agences.map((a) => ({
@@ -34,7 +39,6 @@ export async function POST(req: Request) {
     const body = await req.json();
     console.log('Received data for new agence:', body);
 
-    // Vérifie si le codeAgence existe déjà
     const existingAgence = await prisma.agence.findUnique({
       where: { codeAgence: body.code },
     });
@@ -46,7 +50,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // Si non existant, on crée l'agence
     const newAgence = await prisma.agence.create({
       data: {
         name: body.name,
@@ -82,7 +85,7 @@ export async function PUT(req: Request) {
       where: { id: body.id },
       data: {
         name: body.name,
-        codeAgence: body.codeAgence,
+        codeAgence: body.code,
         provinceId: body.provinceId,
       },
     });
@@ -107,5 +110,26 @@ export async function DELETE(req: Request) {
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error: 'Not found or internal server error' }, { status: 404 });
+  }
+}
+
+export async function PATCH(req: Request) {
+  try {
+    await requireAuth();
+
+    const { id, name } = await req.json();
+    if (!id || !name) {
+      return NextResponse.json({ error: 'Missing id or name' }, { status: 400 });
+    }
+
+    const updated = await prisma.agence.update({
+      where: { id },
+      data: { name },
+    });
+
+    return NextResponse.json(updated);
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

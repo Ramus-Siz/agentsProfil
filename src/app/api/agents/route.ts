@@ -85,7 +85,17 @@ import { requireAuth } from '@/lib/auth-guard';
 import { log } from 'console';
 
 export async function GET() {
-  const agents = await prisma.agent.findMany();
+  const agents = await prisma.agent.findMany(
+    {
+      include: {
+        agence: {
+          include: { province: true },
+        },
+        departement: true,
+        function: true,
+      },
+    }
+  );
 
   return NextResponse.json(agents);
 }

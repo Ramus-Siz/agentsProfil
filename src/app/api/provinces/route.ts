@@ -8,6 +8,7 @@ export async function GET() {
       include: {
         agences: true,
       },
+       orderBy: { name: 'asc' }
     });
 
     const data = provinces.map((p) => ({

@@ -72,7 +72,7 @@ export default function AgencesClient() {
 
   const saveEdit = async (id: number) => {
     await fetch(`/api/agences`, {
-      method: 'PATCH',
+      method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         id,

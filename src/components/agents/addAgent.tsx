@@ -23,6 +23,7 @@ import {
 import { useEffect, useState } from 'react';
 import { Agence, Departement, Function } from '@/types';
 import { toast } from 'sonner';
+import { X } from 'lucide-react';
 
 
 interface Props {
@@ -52,6 +53,7 @@ export function AddAgentDialog({ departments, functions, onAgentAdded }: Props) 
     photoFile: null as File | null,
     departementId: '',
     functionId: '',
+    newFunctionId: '',
     agenceId: '',
     engagementDate: '',
     status: true,
@@ -144,7 +146,14 @@ export function AddAgentDialog({ departments, functions, onAgentAdded }: Props) 
     return data.url;
   };
 
+
+  
+
   const handleSubmit = async () => {
+    if (!form.firstName || !form.lastName || !form.agenceId || !form.departementId) {
+      toast.error('Veuillez remplir tous les champs obligatoires.');
+      return;
+    }
     setIsLoading(true);
     try {
       let photoUrl = form.photoUrl;
@@ -163,7 +172,7 @@ export function AddAgentDialog({ departments, functions, onAgentAdded }: Props) 
         photoUrl,
         agenceId: form.agenceId,
         departementId: Number(form.departementId),
-        functionId: addFonctionId !== '' ? addFonctionId : Number(form.functionId),
+        functionId: form.newFunctionId !== '' ? form.newFunctionId : Number(form.functionId),
         engagementDate: form.engagementDate,
         status: form.status,
       };
@@ -175,10 +184,9 @@ export function AddAgentDialog({ departments, functions, onAgentAdded }: Props) 
       });
 
       if (!res.ok) throw new Error('Erreur lors de l’enregistrement de l’agent.');
-
       onAgentAdded();
       setOpen(false);
-    setOpenAddFunction(false);
+      setOpenAddFunction(false);
       setForm({
         firstName: '',
         lastName: '',
@@ -187,11 +195,12 @@ export function AddAgentDialog({ departments, functions, onAgentAdded }: Props) 
         photoFile: null,
         departementId: '',
         functionId: '',
+        newFunctionId: '',
         agenceId: '',
         engagementDate: '',
         status: false,
       });
-
+      fetchData();
       toast.success('Agent ajouté avec succès');
     } catch (error) {
       toast.error("Erreur lors de l’enregistrement de l’agent.");
@@ -218,10 +227,10 @@ export function AddAgentDialog({ departments, functions, onAgentAdded }: Props) 
     const data = await res.json();
     setAddFonctionId(data.id); 
     setOpenAddFunction(true);
-    console.log('Fonction ajoutée avec ID :', data.id); 
+    console.log('Fonction ajoutée avec ID :', data.id);
 
     setAddName('');
-    // await fetchData();
+    fetchData();
     toast.success(`Fonction ajoutée avec succès (ID: ${data.id})`);
   } catch (error) {
     console.error("Erreur lors de l'ajout de la fonction", error);
@@ -257,23 +266,34 @@ export function AddAgentDialog({ departments, functions, onAgentAdded }: Props) 
             />
           </div>
 
-          <Input
-            placeholder="+243xxxxxxxxx, +243xxxxxxxxx"
-            value={form.phoneNumbers}
-            onChange={handlePhoneChange}
-            onBlur={() =>
-              setForm((prev) => ({
-                ...prev,
-                phoneNumbers: normalizePhoneNumbers(prev.phoneNumbers),
-              }))
-            }
-            maxLength={50}
-            className={
-              getPhonesValidation(form.phoneNumbers)
-                ? 'bg-green-50 border-green-500'
-                : 'bg-red-50 border-red-500'
-            }
-          />
+          <div className="relative">
+  <Input
+    placeholder="+243xxxxxxxxx, +243xxxxxxxxx"
+    value={form.phoneNumbers}
+    onChange={handlePhoneChange}
+    onBlur={() =>
+      setForm((prev) => ({
+        ...prev,
+        phoneNumbers: normalizePhoneNumbers(prev.phoneNumbers),
+      }))
+    }
+    maxLength={50}
+    className={`pr-10 ${getPhonesValidation(form.phoneNumbers)
+      ? 'bg-green-50 border-green-500'
+      : 'bg-red-50 border-red-500'
+    }`}
+  />
+
+  {form.phoneNumbers && (
+    <button
+      type="button"
+      onClick={() => setForm((prev) => ({ ...prev, phoneNumbers: '' }))}
+      className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500"
+    >
+      <X size={16} />
+    </button>
+  )}
+</div>
 
           <label className="block">
             <span className="text-sm font-medium text-gray-700 mb-1 block">
@@ -291,12 +311,12 @@ export function AddAgentDialog({ departments, functions, onAgentAdded }: Props) 
             type="file"
             accept="image/*"
             onChange={handleFileChange}
-            className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+            className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-gray-50 file:text-[#008237] hover:file:bg-[#008237]/10"
           />
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label className="mb-1 block">Département</Label>
+              <Label className="mb-1 block">Département *</Label>
               <Select onValueChange={(value) => handleChange('departementId', value)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Choisir un département" />
@@ -311,7 +331,7 @@ export function AddAgentDialog({ departments, functions, onAgentAdded }: Props) 
               </Select>
             </div>
             <div>
-                <Label className="mb-1 block">Agence</Label>
+                <Label className="mb-1 block">Agence*</Label>
                 <Select onValueChange={(value) => handleChange('agenceId', value)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Choisir une agence" />
@@ -328,7 +348,7 @@ export function AddAgentDialog({ departments, functions, onAgentAdded }: Props) 
 
             <div className="col-span-2 flex justify-between items-center ">
               <div>
-                <Label className="mb-1 block">Fonction</Label>
+                <Label className="mb-1 block">Fonction *</Label>
                 <Select onValueChange={(value) => handleChange('functionId', value) } disabled={openAddFunction}>
                   <SelectTrigger>
                     <SelectValue placeholder="Choisir une fonction" />
@@ -345,15 +365,13 @@ export function AddAgentDialog({ departments, functions, onAgentAdded }: Props) 
               </div>
             
               <div className="">
-                <Label className="mb-1 block">Nouvelle fonction</Label>
+                <Label className="mb-1 block">Ou créer une nouvelle fonction *</Label>
                 <div className='flex items-center gap-2'>
-                  <Input
-                  placeholder="Ou créer une nouvelle fonction"
-                  value={addName}
-                  onChange={(e) => setAddName(e.target.value)}
-                  className="w-64 text-sm"
-                />
-                <Button className='border bg-transparent border-[#95c11e] text-[#656564] px-2 py-1 text-sm' onClick={addFunction}>Créer</Button>
+              <Input
+              placeholder="Nouvelle fonction"
+              value={form.newFunctionId}
+              onChange={(e) => handleChange('newFunctionId', e.target.value)}
+            />
 
                 </div>
                 

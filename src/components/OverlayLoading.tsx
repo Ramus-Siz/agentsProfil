@@ -7,7 +7,7 @@ export default function OverlayLoading() {
         <Image
           src="/Advans_Congo_Logo.svg"
           alt="Chargement"
-          width={80}
+          width={100}
           height={80}
           className="rounded-full"
         />
