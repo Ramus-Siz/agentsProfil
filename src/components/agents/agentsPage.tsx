@@ -105,7 +105,7 @@ export default function AgentsPage({ withButton = true }: AgentsPageProps) {
       });
       setAgents((prev) =>
         prev.map((agent) =>
-          agent.id === id ? { ...agent, status: !currentStatus } : agent
+          agent.id === Number(id) ? { ...agent, status: !currentStatus } : agent
         )
       );
       toast.success('Statut de l\'agent mis à jour avec succès');
@@ -241,7 +241,7 @@ export default function AgentsPage({ withButton = true }: AgentsPageProps) {
                 </Badge>
                 <Switch
                   checked={agent.status === true}
-                  onCheckedChange={() => toggleStatus(agent.id, agent.status)}
+                  onCheckedChange={() => toggleStatus(String(agent.id), agent.status)}
                   disabled={!withButton}
                 />
               </div>

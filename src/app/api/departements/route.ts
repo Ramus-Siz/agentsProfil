@@ -12,9 +12,6 @@ export async function GET() {
       }
         
     );
-    if (!departements || departements.length === 0) {
-      return NextResponse.json({ error: 'No departements found' }, { status: 404 });
-    }
     return NextResponse.json(departements);
   } catch (error) {
     console.error(error);

@@ -11,9 +11,6 @@ export async function GET() {
       orderBy: { name: 'asc' }
     });
 
-    if (!agences || agences.length === 0) {
-      return NextResponse.json({ error: 'No agences found' }, { status: 404 });
-    }
 
     // On retourne aussi le nom de la province avec chaque agence
     const data = agences.map((a) => ({

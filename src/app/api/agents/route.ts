@@ -94,6 +94,7 @@ export async function GET() {
         departement: true,
         function: true,
       },
+      orderBy: { createdAt: 'asc' }
     }
   );
 

@@ -104,25 +104,32 @@ export default function AdvansAgentsPage() {
     };
   });
 
-  const AgentCard = ({ agent }: { agent: Agent }) => (
-    <Card className="rounded-xl shadow-md hover:shadow-xl transition">
-      <CardContent className="flex flex-col items-center p-6 space-y-4">
+ const AgentCard = ({ agent }: { agent: Agent }) => (
+  <Card className="rounded-xl shadow-md hover:shadow-xl transition overflow-hidden group">
+    <CardContent className="flex flex-col items-center p-6 space-y-4 relative">
+      <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-gray-100 transition-transform duration-300 ease-in-out group-hover:scale-125">
         <img
           src={agent.photoUrl || '/images/defaultImage.png'}
           alt={`${agent.firstName} ${agent.lastName}`}
-          className="w-24 h-24 rounded-full object-cover border-4 border-gray-100"
+          className="object-cover w-full h-full"
         />
-        <div className="text-center">
-          <h2 className="font-semibold text-lg">
-            {agent.firstName} {agent.lastName}
-          </h2>
-          <p className="text-xs text-[#008237]">{getFunctionName(agent.functionId)}</p>
-          <p className="text-xs text-gray-400">{getDepartmentName(agent.departementId)}</p>
-          <p className="text-sm font-semibold">{Array.isArray(agent.phoneNumbers) ? agent.phoneNumbers.join(', ') : agent.phoneNumbers}</p>
-        </div>
-      </CardContent>
-    </Card>
-  );
+      </div>
+      <div className="text-center">
+        <h2 className="font-semibold text-lg">
+          {agent.firstName} {agent.lastName}
+        </h2>
+        <p className="text-xs text-[#008237]">{getFunctionName(agent.functionId)}</p>
+        <p className="text-xs text-gray-400">{getDepartmentName(agent.departementId)}</p>
+        <p className="text-sm font-semibold">
+          {Array.isArray(agent.phoneNumbers)
+            ? agent.phoneNumbers.join(', ')
+            : agent.phoneNumbers}
+        </p>
+      </div>
+    </CardContent>
+  </Card>
+);
+
 
   return (
     
@@ -233,13 +240,7 @@ export default function AdvansAgentsPage() {
     </div>
     </div>
     
-
-   
-
     <Separator />
-
-
-
               {loading ? (
         <OverlayLoading />
       ) : (

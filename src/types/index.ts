@@ -8,11 +8,12 @@ export interface Function {
   name: string;
 }
 
+
 export interface Agent {
-  id: string;
+  id: number;
   firstName: string;
   lastName: string;
-  photoUrl: string;
+  photoUrl?: string; 
   status: boolean;
   functionId: string;
   departementId: string;
@@ -20,8 +21,9 @@ export interface Agent {
   provinceId: string;
   phoneNumbers: string[];
   createdAt: string;
-  engagementDate: string;
+  engagementDate?: string; // Optionnel si c'est nullable
 }
+
 
 
 export interface Agence {

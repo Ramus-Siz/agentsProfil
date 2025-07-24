@@ -45,6 +45,7 @@ model Agent {
   photoUrl       String?
   engagementDate String?
   status         Boolean    @default(true)
+  createdAt      DateTime   @default(now())
 
   departementId  Int
   functionId     Int
