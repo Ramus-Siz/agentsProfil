@@ -11,6 +11,7 @@ datasource db {
 model Province {
   id      Int      @id @default(autoincrement())
   name    String
+  createdAt      DateTime   @default(now())
   agences Agence[]
   agents  Agent[]
 }
@@ -19,6 +20,7 @@ model Agence {
   id         Int      @id @default(autoincrement())
   name       String
   codeAgence String   @unique
+  createdAt      DateTime   @default(now())
   provinceId Int
   province   Province @relation(fields: [provinceId], references: [id])
   agents     Agent[]
@@ -29,11 +31,13 @@ model Departement {
   id      Int      @id @default(autoincrement())
   name    String
   agents  Agent[]
+  createdAt      DateTime   @default(now())
 }
 
 model Function {
   id      Int      @id @default(autoincrement())
   name    String
+  createdAt      DateTime   @default(now())
   agents  Agent[]
 }
 

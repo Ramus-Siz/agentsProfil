@@ -149,94 +149,81 @@ export function AddAgentDialog({ departments, functions, onAgentAdded }: Props) 
 
   
 
-  const handleSubmit = async () => {
-    if (!form.firstName || !form.lastName || !form.agenceId || !form.departementId) {
-      toast.error('Veuillez remplir tous les champs obligatoires.');
-      return;
-    }
-    setIsLoading(true);
-    try {
-      let photoUrl = form.photoUrl;
-      if (form.photoFile) {
-        const uploadedUrl = await uploadImage(form.photoFile);
-        if (uploadedUrl) photoUrl = uploadedUrl;
-      }
+ const handleSubmit = async () => {
+  if (!form.firstName || !form.lastName || !form.agenceId || !form.departementId) {
+    toast.error('Veuillez remplir tous les champs obligatoires.');
+    return;
+  }
 
-      const payload = {
-        firstName: form.firstName,
-        lastName: form.lastName,
-        phoneNumbers: form.phoneNumbers
-          .split(',')
-          .map((p) => p.trim())
-          .filter((p) => p !== ''),
-        photoUrl,
-        agenceId: form.agenceId,
-        departementId: Number(form.departementId),
-        functionId: form.newFunctionId !== '' ? form.newFunctionId : Number(form.functionId),
-        engagementDate: form.engagementDate,
-        status: form.status,
-      };
+  if (!form.newFunctionId && !form.functionId) {
+    toast.error('Veuillez choisir une fonction ou en créer une nouvelle.');
+    return;
+  }
 
-      const res = await fetch('/api/agents', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-
-      if (!res.ok) throw new Error('Erreur lors de l’enregistrement de l’agent.');
-      onAgentAdded();
-      setOpen(false);
-      setOpenAddFunction(false);
-      setForm({
-        firstName: '',
-        lastName: '',
-        phoneNumbers: '',
-        photoUrl: '',
-        photoFile: null,
-        departementId: '',
-        functionId: '',
-        newFunctionId: '',
-        agenceId: '',
-        engagementDate: '',
-        status: false,
-      });
-      fetchData();
-      toast.success('Agent ajouté avec succès');
-    } catch (error) {
-      toast.error("Erreur lors de l’enregistrement de l’agent.");
-      console.error('Erreur lors de l’ajout de l’agent :', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
- const addFunction = async () => {
-  setAddFonctionId('');
-  
+  setIsLoading(true);
   try {
-    if (!addName.trim()) return;
+    let photoUrl = form.photoUrl;
 
-    const res = await fetch('/api/function', {
+    if (form.photoFile) {
+      const uploadedUrl = await uploadImage(form.photoFile);
+      if (uploadedUrl) photoUrl = uploadedUrl;
+    }
+
+    const functionId = form.newFunctionId && form.newFunctionId !== ''
+      ? form.newFunctionId
+      : Number(form.functionId);
+      console.log('Function ID:', functionId);
+
+    const payload = {
+      firstName: form.firstName,
+      lastName: form.lastName,
+      phoneNumbers: form.phoneNumbers
+        .split(',')
+        .map((p) => p.trim())
+        .filter((p) => p !== ''),
+      photoUrl,
+      agenceId: form.agenceId,
+      departementId: Number(form.departementId),
+      functionId,
+      engagementDate: form.engagementDate,
+      status: form.status,
+    };
+
+    const res = await fetch('/api/agents', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: addName }),
+      body: JSON.stringify(payload),
     });
 
-    if (!res.ok) throw new Error('Erreur serveur');
+    if (!res.ok) throw new Error('Erreur lors de l’enregistrement de l’agent.');
 
-    const data = await res.json();
-    setAddFonctionId(data.id); 
-    setOpenAddFunction(true);
-    console.log('Fonction ajoutée avec ID :', data.id);
-
-    setAddName('');
+    onAgentAdded();
+    setOpen(false);
+    setOpenAddFunction(false);
+    setForm({
+      firstName: '',
+      lastName: '',
+      phoneNumbers: '',
+      photoUrl: '',
+      photoFile: null,
+      departementId: '',
+      functionId: '',
+      newFunctionId: '',
+      agenceId: '',
+      engagementDate: '',
+      status: false,
+    });
     fetchData();
-    toast.success(`Fonction ajoutée avec succès (ID: ${data.id})`);
+    toast.success('Agent ajouté avec succès');
   } catch (error) {
-    console.error("Erreur lors de l'ajout de la fonction", error);
-    toast.error("Erreur lors de l'ajout de la fonction");
+    toast.error("Erreur lors de l’enregistrement de l’agent.");
+    console.error('Erreur lors de l’ajout de l’agent :', error);
+  } finally {
+    setIsLoading(false);
   }
 };
+
+
 
 
   return (

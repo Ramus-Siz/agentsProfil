@@ -122,6 +122,21 @@ export async function POST(req: Request) {
 
   newAgent.provinceId = provinceId;
 
+   
+  if (typeof newAgent.functionId === 'string' && newAgent.functionId.trim() !== '') {
+     const newFunction = await prisma.function.create({
+        data: {
+          name: newAgent.functionId,
+        },
+      });
+    newAgent.functionId = newFunction.id;
+
+  } else if (typeof newAgent.functionId === 'number') {
+    newAgent.functionId = Number(newAgent.functionId);
+  } else {
+    return NextResponse.json({ error: 'Invalid functionId' }, { status: 400 });
+  }    
+
   const created = await prisma.agent.create({
     data: {
       firstName: newAgent.firstName,

@@ -99,11 +99,15 @@ export default function DepartementsClient() {
   const handleAddDepartment = async () => {
     try {
         if (!newDepartmentName.trim()) return;
-      await fetch('/api/departements', {
+      const res= await fetch('/api/departements', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: newDepartmentName.trim() }),
       });
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || 'Erreur lors de l\'ajout du département');
+      }
       setNewDepartmentName('');
       setShowAddDialog(false);
       await fetchData();

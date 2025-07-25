@@ -21,6 +21,7 @@ export async function GET() {
         id: a.province.id,
         name: a.province.name,
       },
+       orderBy: { createdAt: 'asc' }
     }));
 
     return NextResponse.json(data);

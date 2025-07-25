@@ -9,7 +9,9 @@ export async function GET() {
         include: {
           agents: true,
         },
+       orderBy: { createdAt: 'asc' }
       }
+      
         
     );
     return NextResponse.json(departements);
@@ -26,6 +28,15 @@ export async function POST(req: Request) {
     const data = await req.json();
     if (!data.name) {
       return NextResponse.json({ error: 'Name is required' }, { status: 400 });
+    }
+
+    // Check if the department already exists
+    const existingDepartement = await prisma.departement.findFirst({
+      where: { name: data.name },
+    });
+
+    if (existingDepartement) {
+      return NextResponse.json({ error: 'Le département existe déjà' }, { status: 409 });
     }
 
     const created = await prisma.departement.create({

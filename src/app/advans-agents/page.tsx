@@ -118,7 +118,7 @@ export default function AdvansAgentsPage() {
         <h2 className="font-semibold text-lg">
           {agent.firstName} {agent.lastName}
         </h2>
-        <p className="text-xs text-[#008237]">{getFunctionName(agent.functionId)}</p>
+        <p className="text-sm text-[#008237]">{getFunctionName(agent.functionId)}</p>
         <p className="text-xs text-gray-400">{getDepartmentName(agent.departementId)}</p>
         <p className="text-sm font-semibold">
           {Array.isArray(agent.phoneNumbers)

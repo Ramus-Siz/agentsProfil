@@ -60,7 +60,7 @@ export default function FunctionsClient() {
   };
 
   const saveEdit = async (id: number) => {
-    await fetch(`/api/function`, {
+   const res= await fetch(`/api/function`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id, name: newName }),

@@ -1,11 +1,14 @@
 export interface Departement {
   id: string;
   name: string;
+  createdAt: string;
+
 }
 
 export interface Function {
   id: string;
   name: string;
+  createdAt: string;
 }
 
 
@@ -30,6 +33,7 @@ export interface Agence {
   id: number;
   name: string;
   codeAgence: string;
+  createdAt: string;
   provinceId: number;
   agents: Agent[];
 }
@@ -38,6 +42,7 @@ export interface AgenceForResponse {
   id: number;
   name: string;
   codeAgence: string;
+  createdAt: string;
   provinceId: number;
   province: {
     id: number;
@@ -50,6 +55,7 @@ export interface AgenceForResponse {
 export interface Province {
   id: number;
   name: string;
+  createdAt: string;
   agences: Agence[];
   agents: Agent[];
 }

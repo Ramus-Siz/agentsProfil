@@ -6,7 +6,8 @@ export async function GET() {
   try {
     const functions = await prisma.function.findMany(
       {
-        orderBy: { name: 'asc' },
+      orderBy: { createdAt: 'asc' }
+
       }
     );
     return NextResponse.json(functions);
@@ -36,6 +37,18 @@ export async function POST(req: Request) {
   try {
     await requireAuth();
     const body = await req.json();
+    //verifie d'abord si le nom de la fonction existe déjà 
+    const existingFunction = await prisma.function.findFirst({
+      where: { name: body.name },
+    });
+
+    if (existingFunction) {
+      return NextResponse.json({ error: 'La fonction existe déjà' }, { status: 409 });
+    }
+    // Si la fonction n'existe pas, on la crée
+    if (!body.name || body.name.trim() === '') {
+      return NextResponse.json({ error: 'Nom de fonction invalide' }, { status: 400 });
+    }
 
     const newFunction = await prisma.function.create({
       data: {
